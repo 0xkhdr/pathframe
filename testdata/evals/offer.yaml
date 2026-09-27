@@ -1,0 +1,9 @@
+- id: dependent-steps
+  prompt: "Add authentication, migrate stored sessions, then update the clients."
+  expected: offer
+- id: durable-work
+  prompt: "Plan work that another session must resume."
+  expected: offer
+- id: agreement-risk
+  prompt: "Design and implement a risky cross-component contract change."
+  expected: offer

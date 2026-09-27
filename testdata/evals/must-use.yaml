@@ -1,0 +1,9 @@
+- id: explicit-pathframe
+  prompt: "Use Pathframe to plan this change."
+  expected: must_use
+- id: active-change
+  prompt: "Continue the active Pathframe change."
+  expected: must_use
+- id: workflow-continuation
+  prompt: "Resume the plan we validated yesterday."
+  expected: must_use

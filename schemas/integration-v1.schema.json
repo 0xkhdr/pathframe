@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pathframe.integration/v1",
+  "type": "object",
+  "required": ["schema", "version", "host", "transport", "capabilities", "files"],
+  "properties": {
+    "schema": {"const": "pathframe.integration/v1"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "host": {"const": "codex"},
+    "transport": {"const": "stdio"},
+    "capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "files": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,18 @@
+- id: explanation
+  prompt: "Explain this function."
+  expected: must_not_use
+- id: read-only
+  prompt: "Review this diff without changing it."
+  expected: must_not_use
+- id: brainstorming
+  prompt: "Brainstorm some names."
+  expected: must_not_use
+- id: trivial-edit
+  prompt: "Fix this typo."
+  expected: must_not_use
+- id: operations
+  prompt: "Restart the local server."
+  expected: must_not_use
+- id: direct
+  prompt: "Implement directly; do not use Pathframe."
+  expected: must_not_use

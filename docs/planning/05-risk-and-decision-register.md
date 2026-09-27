@@ -21,7 +21,7 @@ These are not approval requests.
 
 | ID | Risk | Mitigation / recovery | First gate |
 | --- | --- | --- | --- |
-| R-01 | Host formats/capabilities drift | Version manifests, fixtures, Doctor blocker; update adapter only | 3 |
+| R-01 | Host formats/capabilities drift | Stage 3 pins `pathframe.integration/v1`, generated-file hashes, Codex fixtures, and actionable diagnosis; host changes stay in the generator/MCP adapter | 3 |
 | R-02 | Parser accepts ambiguous Markdown | Stage 2 uses flat strict front matter, exact headings, structured verification, and negative fixtures; profile changes remain versioned | 2 |
 | R-03 | Journal append interrupted | Ignore/diagnose incomplete final record; replay prior complete events | 1/8 |
 | R-04 | Projection diverges | Compare replay identity; Doctor rebuilds machine projection | 1/8 |
@@ -32,6 +32,7 @@ These are not approval requests.
 | R-09 | Go 1.26 unavailable in CI | Stage 0 gate fails; fix runner, do not lower version silently | 0 |
 | R-10 | Scope expands toward Specd | Constitution review and deviation record at every gate | all |
 | R-11 | Concurrent CLI writers can race between replay and append | Stage 1 is single-writer; diagnose an invalid chain without rewriting complete records; add cross-process serialization when concurrent mutation is in scope | 9 |
+| R-12 | A repository may already own `.codex/config.toml` or hooks | Stage 3 refuses to overwrite unmanifested or modified files and reports a move/restore/reinstall recovery; native config merging waits for a proven safe ownership contract | 3 |
 
 ## New decisions requiring approval
 

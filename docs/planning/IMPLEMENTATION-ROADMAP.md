@@ -2,7 +2,7 @@
 
 ## Current state
 
-Stages 0 and 1 are approved. Stage 2 is implemented and awaiting its human gate: the owned OKF profile, progressive artifact templates, task parsing and validation, create/template/check/approval operations, material identity invalidation, fixtures, CLI projections, and journeys are present. Integrations remain unimplemented.
+Stages 0 through 2 are approved. Stage 3 is implemented and awaiting its human gate: generated Codex guidance/configuration, activation rules/evaluations, typed local-stdio MCP planning operations, a versioned integration manifest, optional session-start orientation, diagnosis, fixtures, and journeys are present. Later integrations and execution capabilities remain unimplemented.
 
 ## Architecture
 
@@ -14,8 +14,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 | --- | --- | --- | --- |
 | [0](stages/00-foundation.md) | Foundation and constitution | none | approved |
 | [1](stages/01-navigator.md) | Navigator/orientation/recovery kernel | 0 | approved |
-| [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | implemented; awaiting human gate |
-| [3](stages/03-codex.md) | Codex-native planning | 2 | planned |
+| [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | approved |
+| [3](stages/03-codex.md) | Codex-native planning | 2 | implemented; awaiting human gate |
 | [4](stages/04-claude-code.md) | Claude Code parity | 3 | planned |
 | [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | planned |
 | [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | planned |
@@ -45,15 +45,15 @@ Each stage requires implementation complete, focused tests, full affected suite,
 
 ## Next implementation task after the gate
 
-Do not begin Stage 3 until a human approves the Stage 2 gate. After approval, the next task is S3-T1 in [Stage 3](stages/03-codex.md).
+Do not begin Stage 4 until a human approves the Stage 3 gate. After approval, the next task is S4-T1 in [Stage 4](stages/04-claude-code.md).
 
-Stage 2 remains at its stop/go gate until then. Verify it with:
+Stage 3 remains at its stop/go gate until then. Verify it with:
 
 ```sh
-go test ./internal/artifacts ./internal/app ./internal/adapters/cli
-go test ./tests/journey -run 'Quick|Standard|HighRisk|Approval'
+go test ./internal/adapters/mcp ./internal/integrations/codex ./internal/app
+go test ./tests/journey -run CodexPlanning
 go test ./...
 go vet ./...
 ```
 
-Acceptance: every mode generates only required files; Quick has no unused mandatory artifact; instructions are self-contained; every plan needs explicit human approval; material edits invalidate approval; validation failures name executable recovery; Aido absence changes nothing.
+Acceptance: Codex completes request-to-ready through typed tools; activation classes pass; a fresh session resumes canonical state; CLI and MCP project the same contracts; the official SDK remains confined to the MCP adapter; no raw command tool, Claude support, or delegation is present.

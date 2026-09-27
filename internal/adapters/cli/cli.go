@@ -5,10 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/0xkhdr/pathframe/internal/app"
 	"github.com/0xkhdr/pathframe/internal/artifacts"
+	"github.com/0xkhdr/pathframe/internal/integrations/codex"
 	"github.com/0xkhdr/pathframe/internal/workflow"
 )
 
@@ -48,11 +50,41 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	commandChange := commandFlags.String("change", *change, "select a change")
 	commandMode := commandFlags.String("mode", "quick", "planning mode: quick, standard, or high-risk")
 	commandArtifact := commandFlags.String("artifact", "task", "artifact kind")
+	sessionOrientation := commandFlags.Bool("session-orientation", false, "install optional Codex session-start orientation")
 	if err := commandFlags.Parse(remaining); err != nil || commandFlags.NArg() != 0 {
 		return 2
 	}
 
 	service := app.Service{Dir: "."}
+	if command == "codex-install" {
+		executable, err := os.Executable()
+		if err != nil {
+			fmt.Fprintf(stderr, "pathframe: %v\n", err)
+			return 1
+		}
+		result, err := codex.Install(".", executable, *sessionOrientation)
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
+	if command == "codex-doctor" {
+		result := codex.Doctor(".")
+		if *commandJSON {
+			if code := renderJSON(stdout, stderr, result); code != 0 {
+				return code
+			}
+			if !result.Healthy {
+				return 1
+			}
+			return 0
+		}
+		fmt.Fprintf(stdout, "Codex integration healthy: %t\n", result.Healthy)
+		for _, diagnostic := range result.Diagnostics {
+			fmt.Fprintf(stdout, "%s: %s (%s); recovery: %s\n", diagnostic.Path, diagnostic.Message, diagnostic.Code, diagnostic.Recovery)
+		}
+		if !result.Healthy {
+			return 1
+		}
+		return 0
+	}
 	if command == "new" {
 		result, err := service.CreateChange(*commandChange, artifacts.Mode(*commandMode))
 		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
@@ -124,6 +156,11 @@ func renderArtifactResult(w, errw io.Writer, value any, jsonView, allowInvalid b
 			}
 		case artifacts.ApprovalResult:
 			fmt.Fprintf(w, "Change: %s\nMode: %s\nPhase: %s\nPlan identity: %s\n", result.Change, result.Mode, result.Phase, result.Identity)
+		case codex.InstallResult:
+			fmt.Fprintf(w, "Codex integration %s installed\n", result.Version)
+			for _, path := range result.Changed {
+				fmt.Fprintf(w, "Changed: %s\n", path)
+			}
 		}
 	}
 	if operationErr != nil {
@@ -191,7 +228,7 @@ func render(w io.Writer, result workflow.Result, jsonView bool) error {
 }
 
 func usage(w io.Writer) {
-	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|pause|resume|replan|cancel]")
+	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|pause|resume|replan|cancel|codex-install|codex-doctor]")
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "No command and status both show project orientation.")
 	fmt.Fprintln(w, "Options:")
@@ -199,6 +236,7 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  --json       render pathframe.workflow/v1 JSON")
 	fmt.Fprintln(w, "  --mode MODE  quick, standard, or high-risk (new/template)")
 	fmt.Fprintln(w, "  --artifact K artifact kind (template)")
+	fmt.Fprintln(w, "  --session-orientation install the optional Codex SessionStart hook (codex-install)")
 	fmt.Fprintln(w, "  --help       show help")
 	fmt.Fprintln(w, "  --version    show version")
 }

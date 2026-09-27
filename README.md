@@ -14,7 +14,7 @@ The first supported production platform will be Linux amd64 with Go 1.26. Linux 
 
 ## Intended first use
 
-Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. See the [CLI reference](docs/CLI.md) and [artifact profile](docs/ARTIFACTS.md). Later stages will add typed Codex and Claude Code integrations, bounded sequential delegation, verification execution, and broader Doctor recovery.
+Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. See the [CLI reference](docs/CLI.md), [artifact profile](docs/ARTIFACTS.md), and [Codex integration](docs/CODEX.md). Stage 3 adds typed local-stdio planning tools for Codex. Later stages add Claude Code, bounded sequential delegation, verification execution, and broader Doctor recovery.
 
 ## Boundaries
 

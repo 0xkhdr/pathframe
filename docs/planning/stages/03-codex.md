@@ -1,5 +1,7 @@
 # Stage 3: Codex-Native Planning Path
 
+Status: implemented; awaiting human gate.
+
 ## Outcome and why now
 
 Codex can assess, create, validate, approve-handoff, orient, and resume through typed tools without guessing CLI syntax. Canonical operations and artifacts already exist.
@@ -46,3 +48,4 @@ go test ./... && go vet ./...
 
 Codex completes request-to-ready journey through typed tools; no guessed argument order; all activation classes pass; fresh session resumes canonical state; CLI/MCP results match; SDK remains adapter-local. Do not start Claude or delegation until human stop/go.
 
+Implementation evidence: the official MCP Go SDK is pinned at `v1.8.0`; seven planning operations are exposed now, while `prepare_delegation` and `submit_result` remain gated on later canonical operations. Codex repository skill/configuration and optional MCP-backed `SessionStart` orientation are manifest-owned and diagnosed without overwriting modified content.

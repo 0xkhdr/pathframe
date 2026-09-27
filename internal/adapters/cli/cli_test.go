@@ -20,7 +20,7 @@ func TestRun(t *testing.T) {
 		want string
 	}{
 		{name: "orientation", want: "Pathframe\n\nConfigured: false\nActive change: none\nPhase: none\nProgress: 0/0 tasks complete\nBlocked: .pathframe project not found (project_not_found)\nRecommended next action: none\nHuman action required: true\n"},
-		{name: "help", args: []string{"--help"}, want: "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|pause|resume|replan|cancel]\n"},
+		{name: "help", args: []string{"--help"}, want: "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|pause|resume|replan|cancel|codex-install|codex-doctor]\n"},
 		{name: "version", args: []string{"--version"}, want: "dev\n"},
 	}
 
