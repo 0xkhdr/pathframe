@@ -62,6 +62,32 @@ func TestAcceptedTaskAdvancesFrontier(t *testing.T) {
 	}
 }
 
+func TestReplanPreservesOnlyUnaffectedCompletedTasks(t *testing.T) {
+	service, root := submittedService(t, []string{"internal/example.go"}, true)
+	if _, err := service.RunVerification(context.Background(), RunVerificationInput{Change: "demo", Task: "T1", TimeoutMS: 1000}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := service.AcceptTask(AcceptTaskInput{Change: "demo", Task: "T1", Reason: "accepted"}); err != nil {
+		t.Fatal(err)
+	}
+	dir := filepath.Join(root, ".pathframe", "changes", "demo")
+	task2 := filepath.Join(dir, "tasks", "T2.md")
+	data, _ := os.ReadFile(task2)
+	if err := os.WriteFile(task2, []byte(strings.Replace(string(data), "Follow-up", "Replanned follow-up", 1)), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if view, err := service.Orient("demo"); err != nil || view.Phase != workflow.PhaseReplanning {
+		t.Fatalf("orient = %#v, %v", view, err)
+	}
+	if _, err := service.Approve("demo"); err != nil {
+		t.Fatal(err)
+	}
+	prepared, err := service.PrepareDelegation(PrepareInput{Change: "demo"})
+	if err != nil || prepared.Projection.Next != "T2" {
+		t.Fatalf("prepare = %#v, %v", prepared, err)
+	}
+}
+
 func TestDirectBrainTaskVerifiesAndCompletes(t *testing.T) {
 	root := t.TempDir()
 	dir := filepath.Join(root, ".pathframe", "changes", "demo")

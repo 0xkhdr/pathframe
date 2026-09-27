@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/0xkhdr/pathframe/internal/artifacts"
-	"github.com/0xkhdr/pathframe/internal/delegation"
 	"github.com/0xkhdr/pathframe/internal/store"
 	"github.com/0xkhdr/pathframe/internal/workflow"
 )
@@ -89,7 +88,7 @@ func (s Service) Orient(change string) (workflow.Result, error) {
 	}
 	view := result(root, replay.State, replay.Diagnostics)
 	if plan, issues := artifacts.Validate(dir); len(issues) == 0 {
-		completed, completedErr := delegation.CompletedTasks(filepath.Join(dir, "runs"))
+		completed, completedErr := completedTasks(dir, plan)
 		if completedErr != nil {
 			return workflow.Result{}, completedErr
 		}

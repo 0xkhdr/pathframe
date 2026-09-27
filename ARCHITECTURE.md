@@ -84,6 +84,10 @@ The `delegation` domain validates declared host capabilities, enforces delegated
 
 The `verification` domain validates project-contained working directories, executes approved argv directly with required timeouts, independently bounds stdout/stderr, computes relevant repository content identity, and compares reported changed files with advisory scope. Append-only run events retain submissions, every verification outcome, and Brain review decisions. `app.RunVerification`, `AcceptTask`, and `RequestChanges` are shared by CLI and MCP. Passing mechanical verification never implies semantic acceptance; acceptance rejects stale content and advances the completed-task frontier or completes the change. No shell, destructive revert, parallel worker, or expanded Doctor behavior was added.
 
+## Stage 8 Doctor and recovery
+
+The `recovery` domain owns typed diagnosis, deterministic projection comparison/rebuild, abandoned-lease classification, and normalized task-contract identity. `app.Doctor` composes owning validators and exposes read-only preview plus narrowly safe repair through CLI and MCP. Authored artifacts and complete journal/run records are never machine-repaired. Cancellation and lease recovery retain append-only run evidence, while replanning preserves only completions whose task contracts remain unchanged.
+
 ## Legacy reuse rule
 
 Pathframe is a fresh project, not Specd renamed. Do not copy legacy code until a scoped task traces its actual behavior and tests, confirms license and architectural fit, and records why reuse is smaller and safer than a fresh implementation.

@@ -34,13 +34,14 @@ These are not approval requests.
 | R-11 | Concurrent CLI writers can race between replay and append | Stage 1 is single-writer; diagnose an invalid chain without rewriting complete records; add cross-process serialization when concurrent mutation is in scope | 9 |
 | R-12 | A repository may already own `.codex/config.toml` or hooks | Stage 3 refuses to overwrite unmanifested or modified files and reports a move/restore/reinstall recovery; native config merging waits for a proven safe ownership contract | 3 |
 | R-13 | A repository may already own `.mcp.json` or `.claude/settings.json` | Stage 4 refuses to overwrite or merge unmanifested/modified files; users move custom content aside or omit the optional hook. Native merge support waits for a proven ownership contract | 4 |
-| R-14 | Host crash leaves an active lease | Stage 6 persists the exact lease, diagnoses conflicts, and requires exact-ID release before explicit retry or replan; no fallback occurs | 6 |
+| R-14 | Host crash leaves an active lease | Stage 8 diagnoses leases older than the named 24-hour recovery window and records release before explicit retry or replan; no fallback occurs | 6/8 |
 | R-15 | Worker or verification output grows without bound | Stage 6 rejects task results above 256 KiB; Stage 7 independently bounds stdout and stderr with explicit truncation | 6/7 |
 | R-16 | Repository content changes after a passing verification | Stage 7 binds verification to a deterministic relevant-content identity and refuses stale semantic acceptance | 7 |
+| R-17 | Replanning invalidates already accepted work | Stage 8 binds completion to normalized task-contract identity; unchanged tasks remain complete and changed tasks return to the frontier | 8 |
 
 ## New decisions requiring approval
 
-None. Exact numeric defaults for output limits, timeouts, lease age, and context budgets should be conservative named constants when implemented, tested at boundaries, and changed without contract-version churn unless persisted meaning changes.
+None. Exact numeric defaults for output limits, timeouts, and context budgets should be conservative named constants when implemented, tested at boundaries, and changed without contract-version churn unless persisted meaning changes.
 
 ## Deferred decisions
 

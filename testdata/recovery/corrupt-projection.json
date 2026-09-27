@@ -1,0 +1,17 @@
+{
+  "schema": "pathframe.diagnosis/v1",
+  "project_root": "ROOT",
+  "change": "demo",
+  "healthy": false,
+  "repaired": false,
+  "diagnoses": [
+    {
+      "code": "corrupt_projection",
+      "severity": "warning",
+      "subject": "state.json",
+      "evidence": "invalid character 'b' looking for beginning of value",
+      "repair": "rebuild_projection",
+      "human_required": false
+    }
+  ]
+}

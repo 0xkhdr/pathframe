@@ -2,7 +2,7 @@
 
 ## Current state
 
-Stages 0 through 6 are approved. Stage 7 is implemented and awaiting its human gate: structured bounded argv execution, contained workdirs, timeouts/interruption, content identity, advisory scope comparison, separate semantic review, changes-requested recovery, and deterministic frontier/change completion are present.
+Stages 0 through 7 are approved. Stage 8 is implemented and awaiting its human gate: typed diagnosis, safe projection reconstruction, abandoned-lease recovery, replan-aware completion preservation, and retained cancellation history are present.
 
 ## Architecture
 
@@ -19,8 +19,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 | [4](stages/04-claude-code.md) | Claude Code parity | 3 | approved |
 | [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | approved |
 | [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | approved |
-| [7](stages/07-verification-completion.md) | Verification and completion | 6 | implemented; awaiting human gate |
-| [8](stages/08-doctor-recovery.md) | Complete Doctor/recovery | 7 | planned |
+| [7](stages/07-verification-completion.md) | Verification and completion | 6 | approved |
+| [8](stages/08-doctor-recovery.md) | Complete Doctor/recovery | 7 | implemented; awaiting human gate |
 | [9](stages/09-hardening.md) | Adoption hardening and platform proof | 8 | planned |
 
 Stages do not overlap gates. Waves show readiness only, not permission for unsafe concurrent mutation. Parallel Pinkies remain deferred beyond Stage 9.
@@ -45,15 +45,15 @@ Each stage requires implementation complete, focused tests, full affected suite,
 
 ## Next implementation task after the gate
 
-Do not begin Stage 8 until a human approves the Stage 7 gate. After approval, the next task is S8-T1 in [Stage 8](stages/08-doctor-recovery.md).
+Do not begin Stage 9 until a human approves the Stage 8 gate. After approval, the next task is S9-T1 in [Stage 9](stages/09-hardening.md).
 
-Stage 7 remains at its stop/go gate until then. Verify it with:
+Stage 8 remains at its stop/go gate until then. Verify it with:
 
 ```sh
-go test ./internal/verification ./internal/app
-go test ./tests/journey -run 'Verification|Completion|ChangesRequested'
+go test ./internal/recovery ./internal/store ./internal/app
+go test ./tests/journey -run 'Doctor|Recovery|Interrupted|Replan'
 go test ./...
 go vet ./...
 ```
 
-Acceptance: no implicit shell path exists; workdirs cannot escape; results remain bounded and durable; stale content blocks acceptance; scope violations expose keep/revert/replan; mechanical success and semantic acceptance are separate; completion advances the frontier on both hosts.
+Acceptance: every named failure has an executable recovery; projection rebuild is deterministic; abandoned work releases and retries without policy fallback; unaffected completions survive replan; cancellation retains history; repair never edits authored intent or rewrites Git.

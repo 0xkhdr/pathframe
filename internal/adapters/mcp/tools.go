@@ -6,6 +6,7 @@ import (
 
 	"github.com/0xkhdr/pathframe/internal/app"
 	"github.com/0xkhdr/pathframe/internal/artifacts"
+	"github.com/0xkhdr/pathframe/internal/recovery"
 	"github.com/0xkhdr/pathframe/internal/workflow"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -42,7 +43,13 @@ type validateOutput struct {
 
 type recoverInput struct {
 	Change string          `json:"change,omitempty" jsonschema:"change identifier"`
-	Action workflow.Action `json:"action" jsonschema:"one of pause, resume, replan, or cancel"`
+	Action workflow.Action `json:"action,omitempty" jsonschema:"one of pause, resume, replan, or cancel; omit to diagnose"`
+	Repair bool            `json:"repair,omitempty" jsonschema:"apply listed safe machine-state repairs when action is omitted"`
+}
+
+type recoverOutput struct {
+	Diagnosis *recovery.Report `json:"diagnosis,omitempty"`
+	Workflow  *workflow.Result `json:"workflow,omitempty"`
 }
 
 type prepareInput struct {
@@ -110,7 +117,11 @@ func addTools(server *mcp.Server, service app.Service) {
 		out, err := service.CheckBrainEdit(in)
 		return nil, out, err
 	})
-	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_recover", Description: "Apply one supported recovery action: pause, resume, replan, or cancel."}, func(ctx context.Context, _ *mcp.CallToolRequest, in recoverInput) (*mcp.CallToolResult, workflow.Result, error) {
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_recover", Description: "Diagnose and optionally repair replaceable machine state, or apply pause, resume, replan, or cancel."}, func(ctx context.Context, _ *mcp.CallToolRequest, in recoverInput) (*mcp.CallToolResult, recoverOutput, error) {
+		if in.Action == "" {
+			out, err := service.Doctor(app.DoctorInput{Change: in.Change, Repair: in.Repair})
+			return nil, recoverOutput{Diagnosis: &out}, err
+		}
 		var out workflow.Result
 		var err error
 		switch in.Action {
@@ -125,6 +136,6 @@ func addTools(server *mcp.Server, service app.Service) {
 		default:
 			err = fmt.Errorf("unsupported recovery action %q; use pause, resume, replan, or cancel", in.Action)
 		}
-		return nil, out, err
+		return nil, recoverOutput{Workflow: &out}, err
 	})
 }

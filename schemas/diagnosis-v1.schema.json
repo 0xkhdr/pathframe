@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pathframe.dev/schemas/diagnosis-v1.schema.json",
+  "type": "object",
+  "required": ["schema", "healthy", "repaired", "diagnoses"],
+  "properties": {
+    "schema": {"const": "pathframe.diagnosis/v1"},
+    "project_root": {"type": "string"},
+    "change": {"type": "string"},
+    "healthy": {"type": "boolean"},
+    "repaired": {"type": "boolean"},
+    "diagnoses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "severity", "subject", "evidence", "human_required"],
+        "properties": {
+          "code": {"type": "string", "minLength": 1},
+          "severity": {"enum": ["info", "warning", "error"]},
+          "subject": {"type": "string", "minLength": 1},
+          "evidence": {"type": "string", "minLength": 1},
+          "repair": {"enum": ["rebuild_projection", "truncate_incomplete_journal_tail", "release_abandoned_lease"]},
+          "human_required": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

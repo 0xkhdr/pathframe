@@ -69,13 +69,21 @@ func (s Service) ReleaseLease(input ReleaseLeaseInput) (ReleaseLeaseOutput, erro
 	if err := delegation.AppendRun(runsDir, lease.ID, delegation.RunEvent{Schema: delegation.RunSchema, LeaseID: lease.ID, State: "released", Timestamp: now()}); err != nil {
 		return ReleaseLeaseOutput{}, err
 	}
-	if err := s.appendDelegationTransition(dir, workflow.ActionBlock, workflow.ActorSystem, "lost delegation lease explicitly released"); err != nil {
+	replay, err := store.ReplayAndRepair(dir)
+	if err != nil {
 		return ReleaseLeaseOutput{}, err
+	}
+	phase := replay.State.Phase
+	if !phase.Terminal() {
+		if err := s.appendDelegationTransition(dir, workflow.ActionBlock, workflow.ActorSystem, "lost delegation lease explicitly released"); err != nil {
+			return ReleaseLeaseOutput{}, err
+		}
+		phase = workflow.PhaseBlocked
 	}
 	if err := delegation.Release(runsDir, lease); err != nil {
 		return ReleaseLeaseOutput{}, err
 	}
-	return ReleaseLeaseOutput{Change: lease.Change, Task: lease.Task, LeaseID: lease.ID, Phase: workflow.PhaseBlocked, Recovery: []string{"explicitly retry delegation", "replan the task"}}, nil
+	return ReleaseLeaseOutput{Change: lease.Change, Task: lease.Task, LeaseID: lease.ID, Phase: phase, Recovery: []string{"explicitly retry delegation", "replan the task"}}, nil
 }
 
 func (s Service) SubmitResult(input SubmitResultInput) (SubmitResultOutput, error) {

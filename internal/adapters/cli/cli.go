@@ -63,6 +63,7 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	changedFiles := commandFlags.String("changed-files", "", "comma-separated changed files for direct Brain verification")
 	reason := commandFlags.String("reason", "", "semantic review reason")
 	keepScope := commandFlags.Bool("keep-scope-violations", false, "explicitly accept advisory scope violations")
+	repair := commandFlags.Bool("repair", false, "apply only Doctor's listed safe machine-state repairs")
 	sessionOrientation := commandFlags.Bool("session-orientation", false, "install optional host session-start orientation")
 	if err := commandFlags.Parse(remaining); err != nil || commandFlags.NArg() != 0 {
 		return 2
@@ -217,6 +218,31 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		}
 		fmt.Fprintf(stdout, "Brain edit allowed: %t\nReason: %s\n", result.Allowed, result.Reason)
 		if err != nil || !result.Allowed {
+			return 1
+		}
+		return 0
+	}
+	if command == "doctor" {
+		result, err := service.Doctor(app.DoctorInput{Change: *commandChange, Repair: *repair})
+		if *commandJSON {
+			if code := renderJSON(stdout, stderr, result); code != 0 {
+				return code
+			}
+		} else {
+			fmt.Fprintf(stdout, "Pathframe healthy: %t\n", result.Healthy)
+			for _, diagnosis := range result.Diagnoses {
+				fmt.Fprintf(stdout, "%s: %s (%s): %s", diagnosis.Severity, diagnosis.Subject, diagnosis.Code, diagnosis.Evidence)
+				if diagnosis.Repair != "" {
+					fmt.Fprintf(stdout, "; safe repair: %s", diagnosis.Repair)
+				}
+				fmt.Fprintln(stdout)
+			}
+		}
+		if err != nil {
+			fmt.Fprintf(stderr, "pathframe: %v\n", err)
+			return 1
+		}
+		if !result.Healthy {
 			return 1
 		}
 		return 0
@@ -404,7 +430,7 @@ func renderPacket(w io.Writer, result app.PrepareResult) {
 }
 
 func usage(w io.Writer) {
-	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|submit-result|verify|accept-task|request-changes|lease-release|edit-check|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]")
+	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|submit-result|verify|accept-task|request-changes|lease-release|edit-check|doctor|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]")
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "No command and status both show project orientation.")
 	fmt.Fprintln(w, "Options:")
@@ -423,6 +449,7 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  --reason TEXT semantic review reason (accept-task/request-changes)")
 	fmt.Fprintln(w, "  --keep-scope-violations explicitly keep advisory out-of-scope files (accept-task)")
 	fmt.Fprintln(w, "  --lease-id ID exact lost lease to release (lease-release)")
+	fmt.Fprintln(w, "  --repair      apply Doctor's safe machine-state repairs (doctor)")
 	fmt.Fprintln(w, "  --task ID     task whose Brain edit authority is checked (edit-check)")
 	fmt.Fprintln(w, "  --session-orientation install the optional SessionStart hook (host install commands)")
 	fmt.Fprintln(w, "  --help       show help")

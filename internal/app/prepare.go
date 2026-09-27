@@ -57,7 +57,7 @@ func (s Service) PrepareDelegation(input PrepareInput) (PrepareResult, error) {
 		result.Recovery = []string{"repair the named artifacts, revalidate, and request human reapproval"}
 		return result, nil
 	}
-	completed, err := delegation.CompletedTasks(filepath.Join(dir, "runs"))
+	completed, err := completedTasks(dir, plan)
 	if err != nil {
 		return PrepareResult{}, err
 	}

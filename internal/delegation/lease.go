@@ -45,9 +45,10 @@ type Verification struct {
 }
 
 type Review struct {
-	Decision string   `json:"decision"`
-	Reason   string   `json:"reason"`
-	Recovery []string `json:"recovery"`
+	Decision     string   `json:"decision"`
+	Reason       string   `json:"reason"`
+	Recovery     []string `json:"recovery"`
+	TaskIdentity string   `json:"task_identity,omitempty"`
 }
 
 func ActiveLease(runsDir string) (Lease, bool, error) {
@@ -148,6 +149,12 @@ func TaskRun(runsDir, task string) (string, []RunEvent, error) {
 }
 
 func CompletedTasks(runsDir string) ([]string, error) {
+	return CompletedTasksMatching(runsDir, nil)
+}
+
+// CompletedTasksMatching excludes completions whose recorded task contract no
+// longer matches. A nil identity map retains the Stage 7 behavior.
+func CompletedTasksMatching(runsDir string, identities map[string]string) ([]string, error) {
 	paths, err := filepath.Glob(filepath.Join(runsDir, "*.jsonl"))
 	if err != nil {
 		return nil, err
@@ -158,12 +165,15 @@ func CompletedTasks(runsDir string) ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		var task string
+		var task, identity string
 		for _, event := range events {
 			if event.Result != nil {
 				task = event.Result.Task
 			}
-			if task != "" && event.State == "completed" {
+			if event.Review != nil {
+				identity = event.Review.TaskIdentity
+			}
+			if task != "" && event.State == "completed" && (identities == nil || identity != "" && identities[task] == identity) {
 				done[task] = true
 			}
 		}
@@ -174,6 +184,24 @@ func CompletedTasks(runsDir string) ([]string, error) {
 	}
 	sort.Strings(result)
 	return result, nil
+}
+
+func RunStates(runsDir string) (map[string]string, error) {
+	paths, err := filepath.Glob(filepath.Join(runsDir, "*.jsonl"))
+	if err != nil {
+		return nil, err
+	}
+	states := make(map[string]string, len(paths))
+	for _, path := range paths {
+		events, err := readRun(path)
+		if err != nil {
+			return nil, err
+		}
+		if len(events) > 0 {
+			states[events[len(events)-1].LeaseID] = events[len(events)-1].State
+		}
+	}
+	return states, nil
 }
 
 func readRun(path string) ([]RunEvent, error) {

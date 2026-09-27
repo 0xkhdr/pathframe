@@ -7,6 +7,7 @@ import (
 
 	"github.com/0xkhdr/pathframe/internal/artifacts"
 	"github.com/0xkhdr/pathframe/internal/delegation"
+	"github.com/0xkhdr/pathframe/internal/recovery"
 	"github.com/0xkhdr/pathframe/internal/store"
 	"github.com/0xkhdr/pathframe/internal/verification"
 	"github.com/0xkhdr/pathframe/internal/workflow"
@@ -64,11 +65,18 @@ func (s Service) AcceptTask(input AcceptTaskInput) (ReviewOutput, error) {
 	if len(latest.ScopeViolations) > 0 && !input.KeepScopeViolations {
 		return ReviewOutput{}, fmt.Errorf("scope violations require an explicit keep decision, revert, or replan: %s", strings.Join(latest.ScopeViolations, ", "))
 	}
-	review := delegation.Review{Decision: "accepted", Reason: input.Reason, Recovery: []string{}}
+	var accepted artifacts.Task
+	for _, candidate := range plan.Tasks {
+		if candidate.ID == input.Task {
+			accepted = candidate
+			break
+		}
+	}
+	review := delegation.Review{Decision: "accepted", Reason: input.Reason, Recovery: []string{}, TaskIdentity: recovery.TaskIdentity(accepted)}
 	if err := delegation.AppendRun(filepath.Join(dir, "runs"), leaseID, delegation.RunEvent{Schema: delegation.RunSchema, LeaseID: leaseID, State: "completed", Timestamp: now(), Review: &review}); err != nil {
 		return ReviewOutput{}, err
 	}
-	completed, err := delegation.CompletedTasks(filepath.Join(dir, "runs"))
+	completed, err := completedTasks(dir, plan)
 	if err != nil {
 		return ReviewOutput{}, err
 	}
@@ -102,7 +110,7 @@ func (s Service) RequestChanges(input RequestChangesInput) (ReviewOutput, error)
 	if err := s.appendDelegationTransition(dir, workflow.ActionBlock, workflow.ActorBrain, "Brain requested changes for task "+input.Task); err != nil {
 		return ReviewOutput{}, err
 	}
-	completed, err := delegation.CompletedTasks(filepath.Join(dir, "runs"))
+	completed, err := completedTasks(dir, plan)
 	if err != nil {
 		return ReviewOutput{}, err
 	}

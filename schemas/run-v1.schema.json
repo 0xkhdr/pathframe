@@ -6,10 +6,10 @@
   "properties": {
     "schema": {"const": "pathframe.run/v1"},
     "lease_id": {"type": "string", "minLength": 1},
-    "state": {"enum": ["leased", "submitted", "blocked", "released", "verified", "verification_failed", "completed", "changes_requested"]},
+    "state": {"enum": ["leased", "submitted", "blocked", "released", "cancelled", "verified", "verification_failed", "completed", "changes_requested"]},
     "timestamp": {"type": "string", "format": "date-time"},
     "result": {"$ref": "task-result-v1.schema.json"},
     "verification": {"type": "object", "required": ["commands", "content_identity", "passed", "scope_violations"]},
-    "review": {"type": "object", "required": ["decision", "reason", "recovery"]}
+    "review": {"type": "object", "required": ["decision", "reason", "recovery"], "properties": {"task_identity": {"type": "string"}}}
   }
 }
