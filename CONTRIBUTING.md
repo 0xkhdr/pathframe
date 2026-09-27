@@ -1,8 +1,8 @@
 # Contributing to Pathframe
 
-## Start with the current stage
+## Start with the product boundaries
 
-Read [the roadmap](docs/planning/IMPLEMENTATION-ROADMAP.md), its detailed stage file, [PHILOSOPHY.md](PHILOSOPHY.md), and [ARCHITECTURE.md](ARCHITECTURE.md). Do not begin a later stage while the current gate has unresolved failures.
+Read [PHILOSOPHY.md](PHILOSOPHY.md) and [ARCHITECTURE.md](ARCHITECTURE.md) before changing product behavior or architecture.
 
 Each task must name its dependency, owned files or component, governing invariant, focused verification, and observable acceptance criteria. Keep changes small enough to implement without loading the entire repository.
 
@@ -10,7 +10,7 @@ Each task must name its dependency, owned files or component, governing invarian
 
 - Use Go 1.26. Linux amd64 is the only initially supported production platform.
 - Prefer the standard library. The standard `flag` package is the fixed CLI choice.
-- Add no dependency without a concrete need and operational-cost explanation. The official MCP Go SDK is pinned only when Stage 3 starts and stays inside the stdio MCP adapter.
+- Add no dependency without a concrete need and operational-cost explanation. The official MCP Go SDK stays pinned inside the stdio MCP adapter.
 - Keep application operations canonical. CLI, MCP, host guidance, and hooks translate; they do not decide workflow state.
 - Preserve explicit approval, `execution_policy`, sequential delegation, timeout-bound argv verification, and journal-based reconstruction.
 - Never make Git history or conversation history authoritative.
@@ -19,7 +19,7 @@ Each task must name its dependency, owned files or component, governing invarian
 
 ## Verification
 
-Stage 0 will establish these standard checks:
+Run these standard checks:
 
 ```sh
 test -z "$(gofmt -l .)"
@@ -34,6 +34,6 @@ Run the focused package tests first, then the full affected suite and relevant j
 
 Update documentation in the same task when a public contract or supported behavior changes. Accepted implementation decisions are fixed constraints, not recurring questions. Follow [the decision process](docs/decisions/README.md) only when new repository evidence forces a deviation or a new architecture/scope decision blocks work.
 
-## Stage gate
+## Completion gate
 
-A stage exits only when implementation is complete, focused and affected tests pass, its journey is demonstrated, documentation matches behavior, risks are recorded, and a human gives the stop/go decision.
+A change is complete only when focused and affected tests pass, its relevant journey is demonstrated, documentation matches behavior, and unresolved risks are recorded.

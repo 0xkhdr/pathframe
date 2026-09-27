@@ -22,7 +22,7 @@ workflow | artifacts | context | delegation | verification | recovery
  filesystem persistence | optional Git observation | host/process edges
 ```
 
-Planned package direction:
+Package direction:
 
 - `cmd/pathframe` starts the executable and depends on the CLI adapter.
 - `internal/adapters/{cli,mcp}` translates external requests into `internal/app` operations.

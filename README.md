@@ -4,11 +4,11 @@
 
 > The agent reasons. Pathframe makes the path visible, packages the work, validates transitions, and preserves recovery.
 
-Pathframe will give humans and coding agents one local view of current work: where a change is, what is ready, what is blocked, what comes next, and how to recover. It will package approved tasks for direct or delegated execution without becoming an agent runtime.
+Pathframe gives humans and coding agents one local view of current work: where a change is, what is ready, what is blocked, what comes next, and how to recover. It packages approved tasks for direct or delegated execution without becoming an agent runtime.
 
 ## Project status
 
-Pathframe Stage 9 is implemented and awaiting its human stop/go gate. The sequential product includes bounded delegation and verification, Doctor recovery, Linux amd64 installation and hardening evidence, and explicit compatibility and security limits.
+Pathframe Stages 0 through 9 are implemented and approved. The sequential product includes bounded delegation and verification, Doctor recovery, Linux amd64 installation and hardening evidence, and explicit compatibility and security limits.
 
 The supported production platform is Linux amd64 with Go 1.26. Linux arm64, macOS amd64/arm64, and Windows amd64 remain portability targets with cross-build evidence only.
 
@@ -30,6 +30,6 @@ Running `pathframe` without arguments provides project and active-change orienta
 
 Pathframe will not initially provide a proprietary LLM runtime, universal agent support, mandatory Git branches or commits, cryptographic evidence, release orchestration, organization identity management, a custom filesystem sandbox, parallel code-writing workers, speculative plugins, or Specd compatibility.
 
-## Planning and contribution
+## Contributing
 
-Start with [the implementation roadmap](docs/planning/IMPLEMENTATION-ROADMAP.md). Architecture and product constraints are summarized in [ARCHITECTURE.md](ARCHITECTURE.md) and [PHILOSOPHY.md](PHILOSOPHY.md). See [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before changing the repository. Record any intentional deviation from an accepted decision using [the decision process](docs/decisions/README.md).
+Architecture and product constraints are documented in [ARCHITECTURE.md](ARCHITECTURE.md) and [PHILOSOPHY.md](PHILOSOPHY.md). See [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before changing the repository. Record intentional deviations from accepted decisions using [the decision process](docs/decisions/README.md).

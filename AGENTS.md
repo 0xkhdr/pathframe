@@ -2,7 +2,7 @@
 
 ## Authority
 
-Read `pathframe-analysis-plan.md` and `pathframe-coding-agent-implementation-planning-prompt.md` before architecture work. Treat their accepted implementation decisions as fixed unless newer explicit human evidence contradicts them. Follow `docs/planning/IMPLEMENTATION-ROADMAP.md` and the active stage plan.
+Read `PHILOSOPHY.md` and `ARCHITECTURE.md` before architecture work. Treat their accepted implementation decisions as fixed unless newer explicit human evidence contradicts them.
 
 ## Product rules
 
@@ -22,7 +22,7 @@ Read `pathframe-analysis-plan.md` and `pathframe-coding-agent-implementation-pla
 - Go 1.26; Linux amd64 first.
 - Standard-library `flag`; no CLI framework.
 - No-argument `pathframe` must orient.
-- Official MCP Go SDK via local stdio, pinned in Stage 3 and isolated in the MCP adapter.
+- Official MCP Go SDK via local stdio, pinned and isolated in the MCP adapter.
 - Explicit human approval before every `planning -> ready`; material edits require reapproval.
 - Verification uses structured argv, project-contained workdir, required timeout, bounded output, and no implicit shell.
 - Authored artifacts plus append-only `history.jsonl` and bounded run records reconstruct replaceable `state.json`.
@@ -30,11 +30,11 @@ Read `pathframe-analysis-plan.md` and `pathframe-coding-agent-implementation-pla
 
 ## Working method
 
-Implement only the approved task and stage. Read targeted source, tests, contracts, and decisions. Reuse repository code before adding an abstraction or dependency. Keep adapter and domain dependencies pointing inward as described in `ARCHITECTURE.md`.
+Implement only the approved task. Read targeted source, tests, contracts, and decisions. Reuse repository code before adding an abstraction or dependency. Keep adapter and domain dependencies pointing inward as described in `ARCHITECTURE.md`.
 
 Do not copy legacy code until behavior, tests, license, and fit are traced and the reason is recorded. Do not implement deferred features for future flexibility.
 
-Run focused verification, the full affected suite, and the stage journey. Report summary, changed files, commands, risks, and questions. Stop at every stage gate for human approval.
+Run focused verification, the full affected suite, and the relevant journey. Report summary, changed files, commands, risks, and questions.
 
 ## Deviations
 

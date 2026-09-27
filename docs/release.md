@@ -1,9 +1,25 @@
 # Release checklist
 
-Stable release requires an explicit human go decision at the Stage 9 gate.
+Stable release requires an explicit human go decision.
 
 1. Choose a semantic version and build with `-trimpath` and `-X github.com/0xkhdr/pathframe/internal/app.Version=<version>`.
-2. Run formatting, vet, race/full tests, named journey/security/install suites, benchmarks, schema tests, and `git diff --check` exactly as listed in the Stage 9 plan.
+2. Run the release verification suite:
+
+   ```sh
+   test -z "$(gofmt -l .)"
+   go vet ./...
+   go test -race ./...
+   go test ./... -run Journey
+   go test ./... -run Security
+   go test ./... -run Install
+   go test ./... -bench 'Discovery|Validation|Packet' -run '^$'
+   GOOS=linux GOARCH=amd64 go build ./cmd/pathframe
+   GOOS=linux GOARCH=arm64 go build ./cmd/pathframe
+   GOOS=darwin GOARCH=amd64 go build ./cmd/pathframe
+   GOOS=darwin GOARCH=arm64 go build ./cmd/pathframe
+   GOOS=windows GOARCH=amd64 go build ./cmd/pathframe
+   git diff --check
+   ```
 3. Run Linux amd64 clean install, update, failed-update preservation, uninstall, and the complete sequential create/execute/interrupt/recover journey.
 4. Confirm every supported-platform claim has a native build, install, and journey result. Keep cross-build-only systems as portability targets.
 5. Review [security](security.md), [compatibility](compatibility.md), and [limitations](limitations.md); accept or resolve every open finding.
