@@ -3,7 +3,7 @@
 Running `pathframe` with no arguments is equivalent to `pathframe status`. Both answer whether the project is configured, which change and phase are active, task progress, blockers, the recommended next action, legal alternatives, and whether a human is required.
 
 ```text
-pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]
+pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|submit-result|lease-release|edit-check|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]
 ```
 
 - `status` and `next` render the canonical `pathframe.workflow/v1` orientation.
@@ -14,7 +14,10 @@ pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|
 - `template --mode MODE --artifact KIND` prints the owned Markdown template; `--json` returns its typed filling instructions.
 - `check --change ID` validates artifacts, tasks, references, questions, acceptance, and structured verification.
 - `approve --change ID` is the explicit human approval operation and binds the validated material plan identity.
-- `packet --change ID [--task ID] [--budget-bytes N]` previews the bounded `pathframe.task/v1` packet and deterministic frontier/waves. It never launches a worker. Text and JSON project the same packet; write scope is labeled advisory.
+- `packet --change ID [--task ID] [--budget-bytes N]` previews the bounded packet. Add `--host codex|claude-code` to run preflight and acquire one exclusive lease before Brain launches the native Pinky. Pathframe itself never launches a host worker.
+- `submit-result --result-file PATH` validates the leased `pathframe.task-result/v1`, records it, and reconciles to reviewing or blocked. It never accepts or completes a task.
+- `lease-release --change ID --lease-id ID` explicitly releases a lost worker lease and preserves a recoverable blocker.
+- `edit-check --change ID --task ID` enforces Brain edit authority. Delegated policy is denied regardless of delegation failure.
 - `codex-install [--session-orientation]` installs manifest-owned Codex skill and stdio MCP assets; the optional flag adds supported session-start orientation.
 - `codex-doctor` validates the integration version and generated-file hashes without editing workflow state.
 - `claude-install [--session-orientation]` installs manifest-owned Claude Code guidance, stdio MCP configuration, and optional supported session-start hook.
@@ -22,4 +25,4 @@ pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|
 
 Flags may follow the command. Illegal transitions exit nonzero after returning current state, a stable reason code, and executable recovery actions. An incomplete final journal record is diagnosed and safely discarded without inventing state; a missing, corrupt, or divergent projection is rebuilt from complete journal records.
 
-See [Planning artifacts](ARTIFACTS.md), [Codex integration](CODEX.md), and [Claude Code integration](CLAUDE-CODE.md). `pathframe mcp` is the generated local stdio entry point, not a generic command executor. Stage 5 provides packet preview only: no worker launch, lease, result submission, or verification execution exists.
+See [Planning artifacts](ARTIFACTS.md), [Codex integration](CODEX.md), and [Claude Code integration](CLAUDE-CODE.md). `pathframe mcp` is the generated local stdio entry point, not a generic command executor. Stage 6 provides sequential host-native delegation and result reconciliation only; verification execution and completion remain absent.

@@ -74,7 +74,11 @@ The Claude Code generator owns a project skill, slash command, `.mcp.json`, opti
 
 ## Stage 5 context and roles
 
-The `context` domain owns strict role parsing, contained foundation/change references, required/optional byte budgets, omission accounting, and `pathframe.task/v1` assembly. Task and runtime layers are selected canonical facts rather than accumulated files. The `delegation` domain currently owns only deterministic dependency frontier/wave projection; it has no launch, lease, or result behavior. `app.PrepareDelegation` previews these contracts for CLI and MCP. Write scope is advisory and host assurance remains unevaluated until Stage 6.
+The `context` domain owns strict role parsing, contained foundation/change references, required/optional byte budgets, omission accounting, and `pathframe.task/v1` assembly. Task and runtime layers are selected canonical facts rather than accumulated files. At the Stage 5 gate, the `delegation` domain owned only deterministic dependency frontier/wave projection, and `app.PrepareDelegation` was a read-only preview.
+
+## Stage 6 sequential delegation
+
+The `delegation` domain validates declared host capabilities, enforces delegated policy, owns one exclusive active lease, bounds append-only run records, validates `pathframe.task-result/v1`, and produces reconciliation without acceptance. Host integrations declare only native sequential/shared-workspace/result-return facts and provide Pinky instructions; Brain performs the native launch. `app.PrepareDelegation`, `SubmitResult`, `ReleaseLease`, and `CheckBrainEdit` are canonical operations shared by CLI/MCP. Scope remains advisory unless the host manifest explicitly declares enforcement. Failed launch, worker failure, and released leases never change `execution_policy` or authorize Brain fallback.
 
 ## Legacy reuse rule
 

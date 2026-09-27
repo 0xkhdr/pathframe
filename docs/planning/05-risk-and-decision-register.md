@@ -34,6 +34,8 @@ These are not approval requests.
 | R-11 | Concurrent CLI writers can race between replay and append | Stage 1 is single-writer; diagnose an invalid chain without rewriting complete records; add cross-process serialization when concurrent mutation is in scope | 9 |
 | R-12 | A repository may already own `.codex/config.toml` or hooks | Stage 3 refuses to overwrite unmanifested or modified files and reports a move/restore/reinstall recovery; native config merging waits for a proven safe ownership contract | 3 |
 | R-13 | A repository may already own `.mcp.json` or `.claude/settings.json` | Stage 4 refuses to overwrite or merge unmanifested/modified files; users move custom content aside or omit the optional hook. Native merge support waits for a proven ownership contract | 4 |
+| R-14 | Host crash leaves an active lease | Stage 6 persists the exact lease, diagnoses conflicts, and requires exact-ID release before explicit retry or replan; no fallback occurs | 6 |
+| R-15 | Worker result grows without bound | Stage 6 rejects task results above the named 256 KiB run-record limit; verification output receives independent bounds in Stage 7 | 6/7 |
 
 ## New decisions requiring approval
 

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pathframe.dev/schemas/task-result-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "lease_id", "change", "task", "status", "summary", "changed_files", "verification", "discoveries", "questions", "risks"],
+  "properties": {
+    "schema": {"const": "pathframe.task-result/v1"},
+    "lease_id": {"type": "string", "minLength": 1},
+    "change": {"type": "string", "minLength": 1},
+    "task": {"type": "string", "minLength": 1},
+    "status": {"enum": ["completed", "failed", "blocked", "needs_replan"]},
+    "summary": {"type": "string", "minLength": 1},
+    "changed_files": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "verification": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["argv", "outcome"], "properties": {"argv": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "outcome": {"type": "string", "minLength": 1}, "summary": {"type": "string"}}}},
+    "discoveries": {"type": "array", "items": {"type": "string"}},
+    "questions": {"type": "array", "items": {"type": "string"}},
+    "risks": {"type": "array", "items": {"type": "string"}}
+  }
+}

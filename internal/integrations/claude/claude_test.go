@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	pfcontext "github.com/0xkhdr/pathframe/internal/context"
 )
 
 func TestInstallDoctorAndSafeUpdate(t *testing.T) {
@@ -37,6 +39,15 @@ func TestInstallDoctorAndSafeUpdate(t *testing.T) {
 	}
 	if Doctor(root).Healthy {
 		t.Fatal("doctor accepted modified generated file")
+	}
+}
+
+func TestWorkerInstructionsKeepPinkyBounded(t *testing.T) {
+	got := WorkerInstructions(pfcontext.Packet{Schema: pfcontext.PacketSchema, Change: "demo", Task: "T1", ExecutionPolicy: "delegated"})
+	for _, want := range []string{"You are Pinky", "pathframe.task-result/v1", "Do not change Pathframe plan state", `"task": "T1"`} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("instructions missing %q", want)
+		}
 	}
 }
 

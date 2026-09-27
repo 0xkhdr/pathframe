@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	pfcontext "github.com/0xkhdr/pathframe/internal/context"
 )
 
 func TestInstallDoctorAndNonDestructiveUpdate(t *testing.T) {
@@ -64,6 +66,20 @@ func TestManifestSchemaAndOptionalHook(t *testing.T) {
 	}
 	if manifest.Schema != IntegrationSchema || manifest.Version != IntegrationVersion || manifest.Transport != "stdio" {
 		t.Fatalf("manifest = %#v", manifest)
+	}
+	for _, capability := range []string{"sequential_subagent", "shared_workspace", "structured_result_return"} {
+		if !strings.Contains(strings.Join(manifest.Capabilities, ","), capability) {
+			t.Fatalf("manifest missing %s", capability)
+		}
+	}
+}
+
+func TestWorkerInstructionsKeepPinkyBounded(t *testing.T) {
+	got := WorkerInstructions(pfcontext.Packet{Schema: pfcontext.PacketSchema, Change: "demo", Task: "T1", ExecutionPolicy: "delegated"})
+	for _, want := range []string{"You are Pinky", "pathframe.task-result/v1", "Do not change Pathframe plan state", `"task": "T1"`} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("instructions missing %q", want)
+		}
 	}
 }
 

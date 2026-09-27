@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pathframe.dev/schemas/run-v1.schema.json",
+  "type": "object",
+  "required": ["schema", "lease_id", "state", "timestamp"],
+  "properties": {
+    "schema": {"const": "pathframe.run/v1"},
+    "lease_id": {"type": "string", "minLength": 1},
+    "state": {"enum": ["leased", "submitted", "blocked", "released"]},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "result": {"$ref": "task-result-v1.schema.json"}
+  }
+}

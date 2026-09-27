@@ -49,6 +49,7 @@ type prepareInput struct {
 	Change      string `json:"change,omitempty" jsonschema:"change identifier"`
 	Task        string `json:"task,omitempty" jsonschema:"task identifier; omit to select the first deterministic frontier task"`
 	BudgetBytes int    `json:"budget_bytes,omitempty" jsonschema:"positive context byte budget; omit for the documented default"`
+	Host        string `json:"host,omitempty" jsonschema:"codex or claude-code; omit for read-only packet preview"`
 }
 
 func addTools(server *mcp.Server, service app.Service) {
@@ -81,8 +82,20 @@ func addTools(server *mcp.Server, service app.Service) {
 		out, err := service.GetNext(in.Change)
 		return nil, out, err
 	})
-	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_prepare_delegation", Description: "Preview a bounded pathframe.task/v1 packet and deterministic sequential frontier. This does not launch a worker."}, func(ctx context.Context, _ *mcp.CallToolRequest, in prepareInput) (*mcp.CallToolResult, app.PrepareResult, error) {
-		out, err := service.PrepareDelegation(app.PrepareInput{Change: in.Change, Task: in.Task, BudgetBytes: in.BudgetBytes})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_prepare_delegation", Description: "Preview a packet when host is omitted; with a supported host, preflight and acquire one sequential delegation lease before native subagent launch."}, func(ctx context.Context, _ *mcp.CallToolRequest, in prepareInput) (*mcp.CallToolResult, app.PrepareResult, error) {
+		out, err := service.PrepareDelegation(app.PrepareInput{Change: in.Change, Task: in.Task, BudgetBytes: in.BudgetBytes, Host: in.Host})
+		return nil, out, err
+	})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_submit_result", Description: "Validate and reconcile one Pinky pathframe.task-result/v1 submission. This never completes or accepts the task."}, func(ctx context.Context, _ *mcp.CallToolRequest, in app.SubmitResultInput) (*mcp.CallToolResult, app.SubmitResultOutput, error) {
+		out, err := service.SubmitResult(in)
+		return nil, out, err
+	})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_release_delegation", Description: "Explicitly release a lost active lease by exact ID, preserving delegated policy and moving the change to a recoverable blocker."}, func(ctx context.Context, _ *mcp.CallToolRequest, in app.ReleaseLeaseInput) (*mcp.CallToolResult, app.ReleaseLeaseOutput, error) {
+		out, err := service.ReleaseLease(in)
+		return nil, out, err
+	})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_check_brain_edit", Description: "Enforce execution_policy before Brain edits. Delegated tasks remain denied even when launch or execution failed."}, func(ctx context.Context, _ *mcp.CallToolRequest, in app.EditGuardInput) (*mcp.CallToolResult, app.EditGuardOutput, error) {
+		out, err := service.CheckBrainEdit(in)
 		return nil, out, err
 	})
 	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_recover", Description: "Apply one supported recovery action: pause, resume, replan, or cancel."}, func(ctx context.Context, _ *mcp.CallToolRequest, in recoverInput) (*mcp.CallToolResult, workflow.Result, error) {

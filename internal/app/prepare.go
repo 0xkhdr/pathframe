@@ -16,13 +16,17 @@ type PrepareInput struct {
 	Change      string `json:"change,omitempty"`
 	Task        string `json:"task,omitempty"`
 	BudgetBytes int    `json:"budget_bytes,omitempty"`
+	Host        string `json:"host,omitempty"`
 }
 
 type PrepareResult struct {
-	Packet     *pfcontext.Packet     `json:"packet,omitempty"`
-	Projection delegation.Projection `json:"projection"`
-	Issues     []string              `json:"issues"`
-	Recovery   []string              `json:"recovery"`
+	Packet             *pfcontext.Packet     `json:"packet,omitempty"`
+	Projection         delegation.Projection `json:"projection"`
+	Preflight          *delegation.Preflight `json:"preflight,omitempty"`
+	Lease              *delegation.Lease     `json:"lease,omitempty"`
+	WorkerInstructions string                `json:"worker_instructions,omitempty"`
+	Issues             []string              `json:"issues"`
+	Recovery           []string              `json:"recovery"`
 }
 
 func (s Service) PrepareDelegation(input PrepareInput) (PrepareResult, error) {
@@ -34,9 +38,9 @@ func (s Service) PrepareDelegation(input PrepareInput) (PrepareResult, error) {
 	if view.Change == "" {
 		return result, fmt.Errorf("cannot prepare a packet without a selected change")
 	}
-	if view.Phase != workflow.PhaseReady {
-		result.Issues = []string{"change must be ready before packet preparation"}
-		result.Recovery = []string{"validate the plan and obtain explicit human approval"}
+	if view.Phase != workflow.PhaseReady && view.Phase != workflow.PhaseBlocked {
+		result.Issues = []string{"change must be ready or blocked for delegation preparation"}
+		result.Recovery = []string{"validate and approve the plan, or recover the active execution blocker"}
 		return result, nil
 	}
 	root, err := store.Discover(s.Dir)
@@ -135,6 +139,48 @@ func (s Service) PrepareDelegation(input PrepareInput) (PrepareResult, error) {
 		return result, nil
 	}
 	result.Packet = &packet
+	if input.Host == "" {
+		return result, nil
+	}
+	hostDir, manifestHost := input.Host, input.Host
+	switch input.Host {
+	case "codex":
+	case "claude-code":
+		hostDir = "claude"
+	default:
+		result.Issues = []string{"unsupported delegation host: " + input.Host}
+		result.Recovery = []string{"select codex or claude-code and install its integration"}
+		return result, nil
+	}
+	capabilities, err := delegation.LoadCapabilities(filepath.Join(root, ".pathframe", "integrations", hostDir, "manifest.json"), manifestHost)
+	if err != nil {
+		result.Issues = []string{"host capabilities cannot be loaded: " + err.Error()}
+		result.Recovery = []string{"install or repair the " + input.Host + " integration, then retry"}
+		return result, nil
+	}
+	runsDir := filepath.Join(dir, "runs")
+	_, active, err := delegation.ActiveLease(runsDir)
+	if err != nil {
+		return PrepareResult{}, err
+	}
+	preflight := delegation.Check(packet, capabilities, active)
+	result.Preflight = &preflight
+	if !preflight.Ready {
+		result.Issues, result.Recovery = preflight.Issues, preflight.Recovery
+		return result, nil
+	}
+	packet.WriteScopeAssurance, packet.HostAssurance = preflight.WriteScopeAssurance, "declared"
+	result.Packet = &packet
+	lease, err := delegation.Acquire(runsDir, view.Change, task.ID, input.Host, now())
+	if err != nil {
+		return PrepareResult{}, err
+	}
+	if err := s.appendDelegationTransition(dir, workflow.ActionExecute, workflow.ActorBrain, "delegation lease acquired for "+lease.ID); err != nil {
+		_ = delegation.Release(runsDir, lease)
+		return PrepareResult{}, err
+	}
+	result.Lease = &lease
+	result.WorkerInstructions = delegation.WorkerInstructions(packet)
 	return result, nil
 }
 

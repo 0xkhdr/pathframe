@@ -10,7 +10,7 @@ import (
 
 func New(service app.Service) *mcp.Server {
 	server := mcp.NewServer(&mcp.Implementation{Name: "pathframe", Title: "Pathframe", Version: codex.IntegrationVersion}, &mcp.ServerOptions{
-		Instructions: "Use typed Pathframe tools for planning workflow operations. Ask for explicit human approval before approving a valid plan. Never construct Pathframe CLI commands or treat tool failure as permission to bypass workflow state.",
+		Instructions: "Use typed Pathframe tools for planning and sequential delegation. Ask for explicit human approval before approving a valid plan. Never construct Pathframe CLI commands or treat delegation failure as permission for Brain to edit delegated work.",
 	})
 	addTools(server, service)
 	return server

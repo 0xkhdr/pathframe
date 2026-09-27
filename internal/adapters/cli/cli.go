@@ -52,6 +52,9 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	commandMode := commandFlags.String("mode", "quick", "planning mode: quick, standard, or high-risk")
 	commandArtifact := commandFlags.String("artifact", "task", "artifact kind")
 	commandTask := commandFlags.String("task", "", "task identifier")
+	commandHost := commandFlags.String("host", "", "delegation host: codex or claude-code")
+	resultFile := commandFlags.String("result-file", "", "pathframe.task-result/v1 JSON file")
+	leaseID := commandFlags.String("lease-id", "", "exact active lease identifier")
 	budgetBytes := commandFlags.Int("budget-bytes", 0, "context byte budget")
 	sessionOrientation := commandFlags.Bool("session-orientation", false, "install optional host session-start orientation")
 	if err := commandFlags.Parse(remaining); err != nil || commandFlags.NArg() != 0 {
@@ -142,7 +145,7 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
 	}
 	if command == "packet" {
-		result, err := service.PrepareDelegation(app.PrepareInput{Change: *commandChange, Task: *commandTask, BudgetBytes: *budgetBytes})
+		result, err := service.PrepareDelegation(app.PrepareInput{Change: *commandChange, Task: *commandTask, BudgetBytes: *budgetBytes, Host: *commandHost})
 		if err != nil {
 			fmt.Fprintf(stderr, "pathframe: %v\n", err)
 			return 1
@@ -151,13 +154,42 @@ func Run(args []string, stdout, stderr io.Writer) int {
 			if code := renderJSON(stdout, stderr, result); code != 0 {
 				return code
 			}
-			if result.Packet == nil {
+			if result.Packet == nil || (*commandHost != "" && result.Lease == nil) {
 				return 1
 			}
 			return 0
 		}
 		renderPacket(stdout, result)
-		if result.Packet == nil {
+		if result.Packet == nil || (*commandHost != "" && result.Lease == nil) {
+			return 1
+		}
+		return 0
+	}
+	if command == "submit-result" {
+		data, err := os.ReadFile(*resultFile)
+		if err != nil {
+			fmt.Fprintf(stderr, "pathframe: %v\n", err)
+			return 1
+		}
+		var input app.SubmitResultInput
+		if err := json.Unmarshal(data, &input.Result); err != nil {
+			fmt.Fprintf(stderr, "pathframe: %v\n", err)
+			return 1
+		}
+		result, err := service.SubmitResult(input)
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
+	if command == "lease-release" {
+		result, err := service.ReleaseLease(app.ReleaseLeaseInput{Change: *commandChange, LeaseID: *leaseID})
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
+	if command == "edit-check" {
+		result, err := service.CheckBrainEdit(app.EditGuardInput{Change: *commandChange, Task: *commandTask})
+		if *commandJSON {
+			return renderArtifactResult(stdout, stderr, result, true, true, err)
+		}
+		fmt.Fprintf(stdout, "Brain edit allowed: %t\nReason: %s\n", result.Allowed, result.Reason)
+		if err != nil || !result.Allowed {
 			return 1
 		}
 		return 0
@@ -219,6 +251,10 @@ func renderArtifactResult(w, errw io.Writer, value any, jsonView, allowInvalid b
 			for _, path := range result.Changed {
 				fmt.Fprintf(w, "Changed: %s\n", path)
 			}
+		case app.SubmitResultOutput:
+			fmt.Fprintf(w, "Result %s for %s/%s reconciled to %s; phase: %s\n", result.LeaseID, result.Change, result.Task, result.Reconciliation.TaskState, result.Phase)
+		case app.ReleaseLeaseOutput:
+			fmt.Fprintf(w, "Lease %s released for %s/%s; phase: %s\n", result.LeaseID, result.Change, result.Task, result.Phase)
 		}
 	}
 	if operationErr != nil {
@@ -322,10 +358,22 @@ func renderPacket(w io.Writer, result app.PrepareResult) {
 	for i, wave := range result.Projection.Waves {
 		fmt.Fprintf(w, "Wave %d: %s\n", i+1, strings.Join(wave, ", "))
 	}
+	if result.Preflight != nil {
+		fmt.Fprintf(w, "Preflight ready: %t\nHost: %s\n", result.Preflight.Ready, result.Preflight.Host)
+	}
+	if result.Lease != nil {
+		fmt.Fprintf(w, "Lease: %s (%s)\n", result.Lease.ID, result.Lease.State)
+	}
+	for _, issue := range result.Issues {
+		fmt.Fprintf(w, "Issue: %s\n", issue)
+	}
+	for _, recovery := range result.Recovery {
+		fmt.Fprintf(w, "Recovery: %s\n", recovery)
+	}
 }
 
 func usage(w io.Writer) {
-	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]")
+	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|submit-result|lease-release|edit-check|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]")
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "No command and status both show project orientation.")
 	fmt.Fprintln(w, "Options:")
@@ -335,6 +383,10 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  --artifact K artifact kind (template)")
 	fmt.Fprintln(w, "  --task ID     task to preview (packet; defaults to first frontier task)")
 	fmt.Fprintln(w, "  --budget-bytes N explicit context byte budget (packet)")
+	fmt.Fprintln(w, "  --host HOST   preflight and lease for codex or claude-code (packet)")
+	fmt.Fprintln(w, "  --result-file PATH structured Pinky result (submit-result)")
+	fmt.Fprintln(w, "  --lease-id ID exact lost lease to release (lease-release)")
+	fmt.Fprintln(w, "  --task ID     task whose Brain edit authority is checked (edit-check)")
 	fmt.Fprintln(w, "  --session-orientation install the optional SessionStart hook (host install commands)")
 	fmt.Fprintln(w, "  --help       show help")
 	fmt.Fprintln(w, "  --version    show version")

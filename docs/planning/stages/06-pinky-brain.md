@@ -1,5 +1,7 @@
 # Stage 6: Pinky and Brain Vertical Slice
 
+**Status:** implemented; awaiting human stop/go gate.
+
 ## Outcome and why now
 
 Codex and Claude Brain safely launch one sequential native Pinky, receive a structured result, and reconcile it without implicit fallback. Packet quality is already independently proven.
@@ -46,4 +48,3 @@ go test ./...
 ## Acceptance and gate
 
 Both hosts complete one sequential delegation; every preflight failure occurs before mutation; conflicting leases block; Brain cannot silently edit or inherit authority; Pinky only submits; recovery is executable. Human stop/go before completion semantics.
-

@@ -121,6 +121,9 @@ func generated(root, executable string, sessionOrientation bool) (map[string]str
   "pathframe_validate_plan",
   "pathframe_get_next",
   "pathframe_prepare_delegation",
+  "pathframe_submit_result",
+  "pathframe_release_delegation",
+  "pathframe_check_brain_edit",
   "pathframe_recover",
 ]`
 	config := "# " + generatedMarker + "\n[mcp_servers.pathframe]\ncommand = " + q(executable) + "\nargs = [\"mcp\"]\ncwd = " + q(root) + "\nenabled_tools = " + tools + "\n"
@@ -128,7 +131,7 @@ func generated(root, executable string, sessionOrientation bool) (map[string]str
 		".agents/skills/pathframe/SKILL.md": skill,
 		".codex/config.toml":                config,
 	}
-	capabilities := []string{"repository_skill", "stdio_mcp", "typed_planning_tools", "task_packet_preview"}
+	capabilities := []string{"repository_skill", "stdio_mcp", "typed_planning_tools", "task_packet_preview", "sequential_subagent", "shared_workspace", "structured_result_return"}
 	if sessionOrientation {
 		assets[".codex/hooks.json"] = hooks
 		capabilities = append(capabilities, "session_start_orientation")
@@ -187,9 +190,10 @@ Use only the typed `+"`pathframe_*`"+` MCP tools. Never construct Pathframe CLI 
 4. Create a change with `+"`pathframe_create_change`"+` and use `+"`pathframe_get_template`"+` for each required artifact. Brain authors the content; Pathframe validates it.
 5. Call `+"`pathframe_validate_plan`"+` with `+"`human_approved: false`"+`. Fix all reported issues.
 6. Ask the human to approve the validated plan explicitly. Only after approval, call the same tool with `+"`human_approved: true`"+`.
-7. Call `+"`pathframe_get_next`"+` to resume or identify the next legal action. For a ready change, call `+"`pathframe_prepare_delegation`"+` to inspect the bounded task packet and sequential frontier. It previews only and never launches a worker. Use `+"`pathframe_recover`"+` only for its typed recovery actions.
+7. Call `+"`pathframe_get_next`"+` to resume or identify the next legal action. For a ready delegated task, call `+"`pathframe_prepare_delegation`"+` with `+"`host: codex`"+`. Only after its preflight succeeds and returns a lease, launch one native subagent using the packet and Pinky rules. Submit its exact structured result with `+"`pathframe_submit_result`"+`.
+8. Before Brain edits, call `+"`pathframe_check_brain_edit`"+` and obey it. Delegation failure never authorizes Brain fallback. Treat write scope as advisory unless the packet says `+"`host_enforced`"+`.
 
-Do not begin implementation while the plan is not ready. Do not treat packet preview as launch authority. Do not invent worker launch, result submission, verification execution, parallel, or compatibility operations.
+Pathframe never launches the host worker itself. Pinky may implement only the leased task and may only submit a result. Pinky cannot approve itself or alter plan state. Do not invent verification execution, task completion, parallel, or compatibility operations.
 `) + "\n"
 
 const hooks = `{

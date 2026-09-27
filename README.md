@@ -8,13 +8,13 @@ Pathframe will give humans and coding agents one local view of current work: whe
 
 ## Project status
 
-Pathframe Stage 5 is implemented and awaiting its human stop/go gate. It adds role contracts, bounded four-layer context resolution, visible budget omissions, inspectable `pathframe.task/v1` packets, and deterministic task frontier/wave projection over the approved planning path shared by Codex and Claude Code.
+Pathframe Stage 6 is implemented and awaiting its human stop/go gate. Codex and Claude Code now declare the minimum sequential host capabilities, preflight and lease one delegated task, instruct one native Pinky, submit `pathframe.task-result/v1`, and reconcile without Brain fallback. Verification acceptance and task completion remain Stage 7 work.
 
 The first supported production platform will be Linux amd64 with Go 1.26. Linux arm64, macOS amd64/arm64, and Windows amd64 remain portability targets until Stage 9 proves them through CI and end-to-end journeys.
 
 ## Intended first use
 
-Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. See the [CLI reference](docs/CLI.md), [artifact profile](docs/ARTIFACTS.md), [Codex integration](docs/CODEX.md), and [Claude Code integration](docs/CLAUDE-CODE.md). Both hosts share typed planning and packet-preview operations. Later stages add sequential worker launch, verification execution, and broader Doctor recovery.
+Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. See the [CLI reference](docs/CLI.md), [artifact profile](docs/ARTIFACTS.md), [Codex integration](docs/CODEX.md), and [Claude Code integration](docs/CLAUDE-CODE.md). Both hosts share typed planning and sequential delegation operations. Later stages add verification execution/completion and broader Doctor recovery.
 
 ## Boundaries
 

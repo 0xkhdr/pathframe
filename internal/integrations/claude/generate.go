@@ -117,7 +117,7 @@ func generated(executable string, sessionOrientation bool) (map[string]string, M
 		".claude/commands/pathframe.md":     command,
 		".mcp.json":                         string(mcpData) + "\n",
 	}
-	capabilities := []string{"project_skill", "slash_command", "stdio_mcp", "typed_planning_tools", "task_packet_preview"}
+	capabilities := []string{"project_skill", "slash_command", "stdio_mcp", "typed_planning_tools", "task_packet_preview", "sequential_subagent", "shared_workspace", "structured_result_return"}
 	if sessionOrientation {
 		settings := map[string]any{
 			"hooks": map[string]any{
@@ -190,9 +190,10 @@ Use only the typed MCP tools from the `+"`pathframe`"+` server. Never construct 
 4. Create a change and request every required template through typed tools. Brain authors content; Pathframe validates it.
 5. Validate with `+"`human_approved: false`"+` and fix every issue.
 6. Ask for explicit human approval, then validate with `+"`human_approved: true`"+`.
-7. Use `+"`pathframe_get_next`"+` to resume. For a ready change, use `+"`pathframe_prepare_delegation`"+` to inspect the bounded task packet and sequential frontier; it never launches a worker. Use `+"`pathframe_recover`"+` only for typed recovery actions.
+7. Use `+"`pathframe_get_next`"+` to resume. For a ready delegated task, call `+"`pathframe_prepare_delegation`"+` with `+"`host: claude-code`"+`. Only after preflight succeeds and returns a lease, launch one native subagent using the packet and Pinky rules. Submit its exact structured result with `+"`pathframe_submit_result`"+`.
+8. Before Brain edits, call `+"`pathframe_check_brain_edit`"+` and obey it. Delegation failure never authorizes Brain fallback. Write scope is advisory unless the packet says `+"`host_enforced`"+`.
 
-Do not implement while the plan is not ready. Do not treat packet preview as launch authority. Do not invent worker launch, result submission, verification execution, Pinky, parallel, or compatibility operations.
+Pathframe never launches the host worker itself. Pinky may implement only the leased task and may only submit a result. Pinky cannot approve itself or alter plan state. Do not invent verification execution, task completion, parallel, or compatibility operations.
 `) + "\n"
 
 const command = `---

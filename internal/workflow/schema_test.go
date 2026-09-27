@@ -8,7 +8,7 @@ import (
 )
 
 func TestStageOneSchemasAreValidJSON(t *testing.T) {
-	for _, name := range []string{"workflow-v1.schema.json", "transition-event-v1.schema.json"} {
+	for _, name := range []string{"workflow-v1.schema.json", "transition-event-v1.schema.json", "task-result-v1.schema.json", "run-v1.schema.json"} {
 		data, err := os.ReadFile(filepath.Join("..", "..", "schemas", name))
 		if err != nil {
 			t.Fatal(err)

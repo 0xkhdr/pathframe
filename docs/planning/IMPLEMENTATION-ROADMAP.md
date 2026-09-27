@@ -2,7 +2,7 @@
 
 ## Current state
 
-Stages 0 through 4 are approved. Stage 5 is implemented and awaiting its human gate: role contracts, four-layer bounded context, explicit byte budgets and omissions, `pathframe.task/v1` preview, and deterministic frontier/waves are present. Worker execution remains unimplemented.
+Stages 0 through 5 are approved. Stage 6 is implemented and awaiting its human gate: declared host capabilities, preflight, exclusive leases, Codex/Claude sequential Pinky guidance, structured result submission/reconciliation, edit guard, and no-fallback enforcement are present. Verification acceptance and task completion remain unimplemented.
 
 ## Architecture
 
@@ -17,8 +17,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 | [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | approved |
 | [3](stages/03-codex.md) | Codex-native planning | 2 | approved |
 | [4](stages/04-claude-code.md) | Claude Code parity | 3 | approved |
-| [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | implemented; awaiting human gate |
-| [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | planned |
+| [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | approved |
+| [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | implemented; awaiting human gate |
 | [7](stages/07-verification-completion.md) | Verification and completion | 6 | planned |
 | [8](stages/08-doctor-recovery.md) | Complete Doctor/recovery | 7 | planned |
 | [9](stages/09-hardening.md) | Adoption hardening and platform proof | 8 | planned |
@@ -45,15 +45,15 @@ Each stage requires implementation complete, focused tests, full affected suite,
 
 ## Next implementation task after the gate
 
-Do not begin Stage 6 until a human approves the Stage 5 gate. After approval, the next task is S6-T1 in [Stage 6](stages/06-pinky-brain.md).
+Do not begin Stage 7 until a human approves the Stage 6 gate. After approval, the next task is S7-T1 in [Stage 7](stages/07-verification-completion.md).
 
-Stage 5 remains at its stop/go gate until then. Verify it with:
+Stage 6 remains at its stop/go gate until then. Verify it with:
 
 ```sh
-go test ./internal/context ./internal/delegation ./internal/app
-go test ./tests/journey -run 'Packet|Frontier|Context'
+go test ./internal/delegation ./internal/integrations/codex ./internal/integrations/claude ./internal/app
+go test ./tests/journey -run Delegation
 go test ./...
 go vet ./...
 ```
 
-Acceptance: human and machine packet views agree; required context never truncates; unrelated context is absent; optional omissions are visible; frontier and waves are deterministic; cycle and budget failures provide non-destructive recovery; no worker launches and no Stage 6 capability is present.
+Acceptance: both hosts complete one sequential delegation; preflight failures do not mutate workflow state; conflicting leases block; Brain cannot inherit delegated authority; Pinky only submits; lost leases have explicit recovery; no Stage 7 completion behavior exists.
