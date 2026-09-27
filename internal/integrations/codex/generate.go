@@ -120,6 +120,7 @@ func generated(root, executable string, sessionOrientation bool) (map[string]str
   "pathframe_get_template",
   "pathframe_validate_plan",
   "pathframe_get_next",
+  "pathframe_prepare_delegation",
   "pathframe_recover",
 ]`
 	config := "# " + generatedMarker + "\n[mcp_servers.pathframe]\ncommand = " + q(executable) + "\nargs = [\"mcp\"]\ncwd = " + q(root) + "\nenabled_tools = " + tools + "\n"
@@ -127,7 +128,7 @@ func generated(root, executable string, sessionOrientation bool) (map[string]str
 		".agents/skills/pathframe/SKILL.md": skill,
 		".codex/config.toml":                config,
 	}
-	capabilities := []string{"repository_skill", "stdio_mcp", "typed_planning_tools"}
+	capabilities := []string{"repository_skill", "stdio_mcp", "typed_planning_tools", "task_packet_preview"}
 	if sessionOrientation {
 		assets[".codex/hooks.json"] = hooks
 		capabilities = append(capabilities, "session_start_orientation")
@@ -186,9 +187,9 @@ Use only the typed `+"`pathframe_*`"+` MCP tools. Never construct Pathframe CLI 
 4. Create a change with `+"`pathframe_create_change`"+` and use `+"`pathframe_get_template`"+` for each required artifact. Brain authors the content; Pathframe validates it.
 5. Call `+"`pathframe_validate_plan`"+` with `+"`human_approved: false`"+`. Fix all reported issues.
 6. Ask the human to approve the validated plan explicitly. Only after approval, call the same tool with `+"`human_approved: true`"+`.
-7. Call `+"`pathframe_get_next`"+` to resume or identify the next legal action. Use `+"`pathframe_recover`"+` only for its typed recovery actions.
+7. Call `+"`pathframe_get_next`"+` to resume or identify the next legal action. For a ready change, call `+"`pathframe_prepare_delegation`"+` to inspect the bounded task packet and sequential frontier. It previews only and never launches a worker. Use `+"`pathframe_recover`"+` only for its typed recovery actions.
 
-Do not begin implementation while the plan is not ready. Do not invent unavailable delegation, verification, Claude, or compatibility operations.
+Do not begin implementation while the plan is not ready. Do not treat packet preview as launch authority. Do not invent worker launch, result submission, verification execution, parallel, or compatibility operations.
 `) + "\n"
 
 const hooks = `{

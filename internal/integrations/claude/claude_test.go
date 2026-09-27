@@ -24,7 +24,7 @@ func TestInstallDoctorAndSafeUpdate(t *testing.T) {
 	}
 	skillPath := filepath.Join(root, ".claude", "skills", "pathframe", "SKILL.md")
 	skill, _ := os.ReadFile(skillPath)
-	for _, rule := range []string{"must_use", "offer", "must_not_use", "Never construct Pathframe CLI commands", "explicit"} {
+	for _, rule := range []string{"must_use", "offer", "must_not_use", "Never construct Pathframe CLI commands", "pathframe_prepare_delegation", "never launches", "explicit"} {
 		if !strings.Contains(string(skill), rule) {
 			t.Fatalf("skill missing %q", rule)
 		}

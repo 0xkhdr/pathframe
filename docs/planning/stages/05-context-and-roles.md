@@ -47,3 +47,4 @@ go test ./...
 
 Human preview matches machine packet; required context is complete; irrelevant context absent; all omissions visible; frontier deterministic; cycles and budget failures recover without deletion. No worker launches. Human approves packet quality before Stage 6.
 
+Implementation evidence: strict `pathframe.role/v1` files select project-relative required and optional foundation reads; task required reads remain change-relative; selected task and canonical workflow facts form the task/runtime layers. A deterministic byte budget blocks oversized required context and reports every optional omission. CLI and typed MCP call the same `PrepareDelegation` preview operation, which emits an advisory-scope `pathframe.task/v1` packet plus sorted frontier/waves. Dependency cycles, missing roles, unsafe paths, non-frontier selections, and budget failures return corrective actions without mutation. No Stage 6 execution capability exists.

@@ -2,7 +2,7 @@
 
 ## Current state
 
-Stages 0 through 3 are approved. Stage 4 is implemented and awaiting its human gate: Claude Code guidance, command, project MCP configuration, optional supported session-start hook, manifest-owned safe updates, diagnosis, shared activation fixtures, and planning/resume journeys are present. Execution capabilities remain unimplemented.
+Stages 0 through 4 are approved. Stage 5 is implemented and awaiting its human gate: role contracts, four-layer bounded context, explicit byte budgets and omissions, `pathframe.task/v1` preview, and deterministic frontier/waves are present. Worker execution remains unimplemented.
 
 ## Architecture
 
@@ -16,8 +16,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 | [1](stages/01-navigator.md) | Navigator/orientation/recovery kernel | 0 | approved |
 | [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | approved |
 | [3](stages/03-codex.md) | Codex-native planning | 2 | approved |
-| [4](stages/04-claude-code.md) | Claude Code parity | 3 | implemented; awaiting human gate |
-| [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | planned |
+| [4](stages/04-claude-code.md) | Claude Code parity | 3 | approved |
+| [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | implemented; awaiting human gate |
 | [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | planned |
 | [7](stages/07-verification-completion.md) | Verification and completion | 6 | planned |
 | [8](stages/08-doctor-recovery.md) | Complete Doctor/recovery | 7 | planned |
@@ -45,15 +45,15 @@ Each stage requires implementation complete, focused tests, full affected suite,
 
 ## Next implementation task after the gate
 
-Do not begin Stage 5 until a human approves the Stage 4 gate. After approval, the next task is S5-T1 in [Stage 5](stages/05-context-and-roles.md).
+Do not begin Stage 6 until a human approves the Stage 5 gate. After approval, the next task is S6-T1 in [Stage 6](stages/06-pinky-brain.md).
 
-Stage 4 remains at its stop/go gate until then. Verify it with:
+Stage 5 remains at its stop/go gate until then. Verify it with:
 
 ```sh
-go test ./internal/integrations/claude ./internal/adapters/mcp ./internal/app
-go test ./tests/journey -run ClaudePlanning
+go test ./internal/context ./internal/delegation ./internal/app
+go test ./tests/journey -run 'Packet|Frontier|Context'
 go test ./...
 go vet ./...
 ```
 
-Acceptance: both hosts complete the same request-to-ready semantics through typed tools; shared activation classes pass; fresh sessions resume canonical state; Claude host differences are explicit; broken generated configuration is actionable; no lifecycle logic is duplicated and no Stage 5 capability is present.
+Acceptance: human and machine packet views agree; required context never truncates; unrelated context is absent; optional omissions are visible; frontier and waves are deterministic; cycle and budget failures provide non-destructive recovery; no worker launches and no Stage 6 capability is present.

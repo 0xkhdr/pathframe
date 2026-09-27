@@ -72,6 +72,10 @@ The Codex generator owns repository skill, project MCP configuration, optional `
 
 The Claude Code generator owns a project skill, slash command, `.mcp.json`, optional supported `SessionStart` command hook, and a host-specific `pathframe.integration/v1` manifest. These assets call the same typed MCP and canonical application operations as Codex. Hash ownership makes install/update non-destructive, and host-specific Doctor checks report drift without editing workflow artifacts.
 
+## Stage 5 context and roles
+
+The `context` domain owns strict role parsing, contained foundation/change references, required/optional byte budgets, omission accounting, and `pathframe.task/v1` assembly. Task and runtime layers are selected canonical facts rather than accumulated files. The `delegation` domain currently owns only deterministic dependency frontier/wave projection; it has no launch, lease, or result behavior. `app.PrepareDelegation` previews these contracts for CLI and MCP. Write scope is advisory and host assurance remains unevaluated until Stage 6.
+
 ## Legacy reuse rule
 
 Pathframe is a fresh project, not Specd renamed. Do not copy legacy code until a scoped task traces its actual behavior and tests, confirms license and architectural fit, and records why reuse is smaller and safer than a fresh implementation.

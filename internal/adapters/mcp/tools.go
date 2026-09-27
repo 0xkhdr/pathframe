@@ -45,6 +45,12 @@ type recoverInput struct {
 	Action workflow.Action `json:"action" jsonschema:"one of pause, resume, replan, or cancel"`
 }
 
+type prepareInput struct {
+	Change      string `json:"change,omitempty" jsonschema:"change identifier"`
+	Task        string `json:"task,omitempty" jsonschema:"task identifier; omit to select the first deterministic frontier task"`
+	BudgetBytes int    `json:"budget_bytes,omitempty" jsonschema:"positive context byte budget; omit for the documented default"`
+}
+
 func addTools(server *mcp.Server, service app.Service) {
 	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_orient", Description: "Read canonical project and active-change orientation. Safe at session start."}, func(ctx context.Context, _ *mcp.CallToolRequest, in changeInput) (*mcp.CallToolResult, workflow.Result, error) {
 		out, err := service.Orient(in.Change)
@@ -73,6 +79,10 @@ func addTools(server *mcp.Server, service app.Service) {
 	})
 	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_get_next", Description: "Return the canonical recommended next action and legal alternatives."}, func(ctx context.Context, _ *mcp.CallToolRequest, in changeInput) (*mcp.CallToolResult, workflow.Result, error) {
 		out, err := service.GetNext(in.Change)
+		return nil, out, err
+	})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_prepare_delegation", Description: "Preview a bounded pathframe.task/v1 packet and deterministic sequential frontier. This does not launch a worker."}, func(ctx context.Context, _ *mcp.CallToolRequest, in prepareInput) (*mcp.CallToolResult, app.PrepareResult, error) {
+		out, err := service.PrepareDelegation(app.PrepareInput{Change: in.Change, Task: in.Task, BudgetBytes: in.BudgetBytes})
 		return nil, out, err
 	})
 	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_recover", Description: "Apply one supported recovery action: pause, resume, replan, or cancel."}, func(ctx context.Context, _ *mcp.CallToolRequest, in recoverInput) (*mcp.CallToolResult, workflow.Result, error) {

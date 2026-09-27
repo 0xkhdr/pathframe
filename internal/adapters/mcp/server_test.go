@@ -30,7 +30,7 @@ func TestTypedPlanningToolsAndCanonicalOrientation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := map[string]bool{"pathframe_orient": true, "pathframe_assess_request": true, "pathframe_create_change": true, "pathframe_get_template": true, "pathframe_validate_plan": true, "pathframe_get_next": true, "pathframe_recover": true}
+	want := map[string]bool{"pathframe_orient": true, "pathframe_assess_request": true, "pathframe_create_change": true, "pathframe_get_template": true, "pathframe_validate_plan": true, "pathframe_get_next": true, "pathframe_prepare_delegation": true, "pathframe_recover": true}
 	for _, tool := range listed.Tools {
 		delete(want, tool.Name)
 		if tool.Name == "run_pathframe_command" {

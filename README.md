@@ -8,13 +8,13 @@ Pathframe will give humans and coding agents one local view of current work: whe
 
 ## Project status
 
-Pathframe Stage 2 is implemented and awaiting its human stop/go gate. It adds the Pathframe-owned `okf-markdown/v1` profile, progressive Quick/Standard/High-risk artifacts, task-per-file validation, canonical create/template/check/approval operations, and material-change reapproval over the Stage 1 Navigator.
+Pathframe Stage 5 is implemented and awaiting its human stop/go gate. It adds role contracts, bounded four-layer context resolution, visible budget omissions, inspectable `pathframe.task/v1` packets, and deterministic task frontier/wave projection over the approved planning path shared by Codex and Claude Code.
 
 The first supported production platform will be Linux amd64 with Go 1.26. Linux arm64, macOS amd64/arm64, and Windows amd64 remain portability targets until Stage 9 proves them through CI and end-to-end journeys.
 
 ## Intended first use
 
-Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. See the [CLI reference](docs/CLI.md), [artifact profile](docs/ARTIFACTS.md), [Codex integration](docs/CODEX.md), and [Claude Code integration](docs/CLAUDE-CODE.md). Stages 3–4 provide the same typed local-stdio planning path on both hosts. Later stages add bounded context, sequential delegation, verification execution, and broader Doctor recovery.
+Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. See the [CLI reference](docs/CLI.md), [artifact profile](docs/ARTIFACTS.md), [Codex integration](docs/CODEX.md), and [Claude Code integration](docs/CLAUDE-CODE.md). Both hosts share typed planning and packet-preview operations. Later stages add sequential worker launch, verification execution, and broader Doctor recovery.
 
 ## Boundaries
 

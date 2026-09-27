@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pathframe.dev/schemas/role-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "mission", "reads", "optional_reads", "allowed_actions", "returns"],
+  "properties": {
+    "schema": {"const": "pathframe.role/v1"},
+    "id": {"type": "string", "minLength": 1},
+    "mission": {"type": "string", "minLength": 1},
+    "reads": {"type": "array", "items": {"type": "string"}},
+    "optional_reads": {"type": "array", "items": {"type": "string"}},
+    "allowed_actions": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "returns": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  }
+}

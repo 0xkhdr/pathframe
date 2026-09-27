@@ -17,3 +17,9 @@ Use `pathframe new --change ID --mode MODE` to create only missing files. Raisin
 `pathframe check --change ID` validates the complete plan. `pathframe approve --change ID` validates again and records explicit human approval of the normalized material identity. Whitespace-only normalization does not change that identity. Content, references, mode, or execution-policy edits do; the next canonical operation moves a ready plan to `replanning`, preserves files and history, and requires validation and approval again.
 
 Pathframe owns `history.jsonl` and `state.json`. Humans and agents own `change.yaml`, artifact Markdown, and task files. Aido is neither required nor written or detected by these operations.
+
+## Roles and context packets
+
+Roles live at `.pathframe/roles/<id>.yaml` with `schema: pathframe.role/v1`, an ID and mission, JSON-array `reads`, `optional_reads`, `allowed_actions`, and `returns`. Role reads are project-relative foundation context. Task `Required Reads` are change-relative context; the selected task contract and current canonical workflow facts supply task and runtime context. Paths and symlink targets must remain inside their owning root.
+
+`pathframe packet` assembles `pathframe.task/v1` only for an approved frontier task. The sorted frontier and dependency waves describe readiness; `next` selects one task for sequential execution and does not authorize parallel mutation. The default budget is 65536 bytes and `--budget-bytes` changes it explicitly. Required context is complete or packet creation blocks with split/raise recovery. Optional context is included in declared order while it fits; every omission records its layer, path, size, and reason. Unreferenced tasks and knowledge are excluded. Declared write scope is advisory, never described as filesystem containment.

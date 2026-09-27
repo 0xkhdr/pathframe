@@ -117,7 +117,7 @@ func generated(executable string, sessionOrientation bool) (map[string]string, M
 		".claude/commands/pathframe.md":     command,
 		".mcp.json":                         string(mcpData) + "\n",
 	}
-	capabilities := []string{"project_skill", "slash_command", "stdio_mcp", "typed_planning_tools"}
+	capabilities := []string{"project_skill", "slash_command", "stdio_mcp", "typed_planning_tools", "task_packet_preview"}
 	if sessionOrientation {
 		settings := map[string]any{
 			"hooks": map[string]any{
@@ -190,9 +190,9 @@ Use only the typed MCP tools from the `+"`pathframe`"+` server. Never construct 
 4. Create a change and request every required template through typed tools. Brain authors content; Pathframe validates it.
 5. Validate with `+"`human_approved: false`"+` and fix every issue.
 6. Ask for explicit human approval, then validate with `+"`human_approved: true`"+`.
-7. Use `+"`pathframe_get_next`"+` to resume and `+"`pathframe_recover`"+` only for typed recovery actions.
+7. Use `+"`pathframe_get_next`"+` to resume. For a ready change, use `+"`pathframe_prepare_delegation`"+` to inspect the bounded task packet and sequential frontier; it never launches a worker. Use `+"`pathframe_recover`"+` only for typed recovery actions.
 
-Do not implement while the plan is not ready. Do not invent delegation, context packet, verification-execution, Pinky, parallel, or compatibility operations.
+Do not implement while the plan is not ready. Do not treat packet preview as launch authority. Do not invent worker launch, result submission, verification execution, Pinky, parallel, or compatibility operations.
 `) + "\n"
 
 const command = `---

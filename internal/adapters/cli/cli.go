@@ -51,6 +51,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	commandChange := commandFlags.String("change", *change, "select a change")
 	commandMode := commandFlags.String("mode", "quick", "planning mode: quick, standard, or high-risk")
 	commandArtifact := commandFlags.String("artifact", "task", "artifact kind")
+	commandTask := commandFlags.String("task", "", "task identifier")
+	budgetBytes := commandFlags.Int("budget-bytes", 0, "context byte budget")
 	sessionOrientation := commandFlags.Bool("session-orientation", false, "install optional host session-start orientation")
 	if err := commandFlags.Parse(remaining); err != nil || commandFlags.NArg() != 0 {
 		return 2
@@ -138,6 +140,27 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	if command == "approve" {
 		result, err := service.Approve(*commandChange)
 		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
+	if command == "packet" {
+		result, err := service.PrepareDelegation(app.PrepareInput{Change: *commandChange, Task: *commandTask, BudgetBytes: *budgetBytes})
+		if err != nil {
+			fmt.Fprintf(stderr, "pathframe: %v\n", err)
+			return 1
+		}
+		if *commandJSON {
+			if code := renderJSON(stdout, stderr, result); code != 0 {
+				return code
+			}
+			if result.Packet == nil {
+				return 1
+			}
+			return 0
+		}
+		renderPacket(stdout, result)
+		if result.Packet == nil {
+			return 1
+		}
+		return 0
 	}
 	var result workflow.Result
 	var err error
@@ -262,8 +285,47 @@ func render(w io.Writer, result workflow.Result, jsonView bool) error {
 	return nil
 }
 
+func renderPacket(w io.Writer, result app.PrepareResult) {
+	if result.Packet == nil {
+		fmt.Fprintln(w, "Task packet unavailable")
+		for _, issue := range result.Issues {
+			fmt.Fprintf(w, "Issue: %s\n", issue)
+		}
+		for _, recovery := range result.Recovery {
+			fmt.Fprintf(w, "Recovery: %s\n", recovery)
+		}
+		return
+	}
+	packet := result.Packet
+	fmt.Fprintf(w, "Task packet %s\n\nChange: %s\nTask: %s - %s\nExecution policy: %s\nRole: %s\n", packet.Schema, packet.Change, packet.Task, packet.Title, packet.ExecutionPolicy, packet.Role.ID)
+	fmt.Fprintf(w, "Role mission: %s\nObjective:\n%s\nAcceptance:\n%s\n", packet.Role.Mission, packet.Objective, packet.Acceptance)
+	for _, field := range []struct {
+		name  string
+		value any
+	}{
+		{"References", packet.References}, {"Dependencies", packet.Dependencies}, {"Completed prerequisites", packet.CompletedPrerequisites},
+		{"Write scope", packet.WriteScope}, {"Constraints", packet.Constraints}, {"Verification", packet.Verification},
+		{"Role actions", packet.Role.AllowedActions}, {"Role returns", packet.Role.Returns},
+	} {
+		data, _ := json.Marshal(field.value)
+		fmt.Fprintf(w, "%s: %s\n", field.name, data)
+	}
+	fmt.Fprintf(w, "Context budget: %d/%d bytes (%d required, %d omitted)\nWrite scope assurance: %s\n", packet.Budget.IncludedBytes, packet.Budget.LimitBytes, packet.Budget.RequiredBytes, packet.Budget.OmittedBytes, packet.WriteScopeAssurance)
+	for _, entry := range packet.Context {
+		fmt.Fprintf(w, "Context: %s %s (%d bytes, required=%t)\n%s\n", entry.Layer, entry.Path, entry.Bytes, entry.Required, entry.Content)
+	}
+	for _, omission := range packet.Omissions {
+		fmt.Fprintf(w, "Omitted: %s %s (%d bytes): %s\n", omission.Layer, omission.Path, omission.Bytes, omission.Reason)
+	}
+	fmt.Fprintf(w, "Frontier: %s\n", strings.Join(result.Projection.Frontier, ", "))
+	fmt.Fprintf(w, "Sequential next task: %s\n", result.Projection.Next)
+	for i, wave := range result.Projection.Waves {
+		fmt.Fprintf(w, "Wave %d: %s\n", i+1, strings.Join(wave, ", "))
+	}
+}
+
 func usage(w io.Writer) {
-	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]")
+	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]")
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "No command and status both show project orientation.")
 	fmt.Fprintln(w, "Options:")
@@ -271,6 +333,8 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  --json       render pathframe.workflow/v1 JSON")
 	fmt.Fprintln(w, "  --mode MODE  quick, standard, or high-risk (new/template)")
 	fmt.Fprintln(w, "  --artifact K artifact kind (template)")
+	fmt.Fprintln(w, "  --task ID     task to preview (packet; defaults to first frontier task)")
+	fmt.Fprintln(w, "  --budget-bytes N explicit context byte budget (packet)")
 	fmt.Fprintln(w, "  --session-orientation install the optional SessionStart hook (host install commands)")
 	fmt.Fprintln(w, "  --help       show help")
 	fmt.Fprintln(w, "  --version    show version")

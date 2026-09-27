@@ -26,8 +26,8 @@ These are not approval requests.
 | R-03 | Journal append interrupted | Ignore/diagnose incomplete final record; replay prior complete events | 1/8 |
 | R-04 | Projection diverges | Compare replay identity; Doctor rebuilds machine projection | 1/8 |
 | R-05 | Path/symlink escape | Resolve against project root and reject escapes before I/O/exec | 0/7 |
-| R-06 | Delegation falsely implies containment | Persist enforcement assurance and label advisory scope | 5/6 |
-| R-07 | Required context exceeds budget | Block packet; split task or explicitly raise budget | 5 |
+| R-06 | Delegation falsely implies containment | Stage 5 packets label write scope `advisory` and host assurance `not_evaluated`; Stage 6 may strengthen assurance only from declared host facts | 5/6 |
+| R-07 | Required context exceeds budget | Stage 5 blocks packet without truncation and reports split-task or explicit `budget_bytes` increase recovery | 5 |
 | R-08 | Verification becomes stale after edits | Bind results to deterministic repository content identity | 7 |
 | R-09 | Go 1.26 unavailable in CI | Stage 0 gate fails; fix runner, do not lower version silently | 0 |
 | R-10 | Scope expands toward Specd | Constitution review and deviation record at every gate | all |
