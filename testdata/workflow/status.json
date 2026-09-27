@@ -1,0 +1,28 @@
+{
+  "alternatives": [
+    {
+      "action": "pause"
+    },
+    {
+      "action": "replan"
+    },
+    {
+      "action": "cancel"
+    }
+  ],
+  "blockers": [],
+  "change": "demo",
+  "configured": true,
+  "diagnostics": [],
+  "human_required": false,
+  "phase": "exploring",
+  "progress": {
+    "completed": 0,
+    "total": 0
+  },
+  "project_root": "ROOT",
+  "recommended": {
+    "action": "plan"
+  },
+  "schema": "pathframe.workflow/v1"
+}

@@ -54,9 +54,11 @@ Version only persisted or process boundaries: `pathframe.workflow/v1`, `pathfram
 
 Humans and agents author change artifacts. Pathframe owns transition and run records plus replaceable projections. Filesystem paths, host results, and verification arguments are untrusted. Pathframe rejects project-root and symlink escapes, bounds output and duration, and never executes verification through an implicit shell.
 
-## Stage 0 boundary
+## Stage 1 state and recovery
 
-Stage 0 targets Go 1.26 on Linux amd64. It establishes constitution documents, a minimal CLI, smoke tests, and CI. It does not implement workflow persistence, artifacts, MCP, delegation, verification, or recovery behavior.
+The Navigator domain owns phase/task-state transition tables and deterministic legal actions without filesystem imports. The store discovers `.pathframe`, rejects escaping change paths, appends `pathframe.transition/v1` records, replays only newline-complete records, and atomically replaces `state.json`. The application layer selects a change, coordinates replay and transitions, and returns `pathframe.workflow/v1`; CLI text and JSON are projections of that result.
+
+Stage 1 does not implement authored artifacts, templates, approval workflows, MCP, delegation, or verification execution. Those remain gated by later stages.
 
 ## Legacy reuse rule
 

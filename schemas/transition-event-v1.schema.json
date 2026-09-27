@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pathframe.dev/schemas/transition-event-v1.schema.json",
+  "title": "Pathframe transition event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "timestamp", "actor", "action", "change", "target"],
+  "properties": {
+    "schema": {"const": "pathframe.transition/v1"},
+    "id": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "actor": {"enum": ["human", "brain", "pinky", "system"]},
+    "action": {"enum": ["initialize", "plan", "approve", "execute", "review", "complete", "block", "pause", "resume", "replan", "cancel"]},
+    "change": {"type": "string", "minLength": 1},
+    "source": {"type": "string"},
+    "target": {"type": "string"},
+    "resume_phase": {"type": "string"},
+    "reason": {"type": "string"}
+  }
+}

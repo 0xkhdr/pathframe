@@ -2,7 +2,7 @@
 
 ## Current state
 
-The Stage 0 foundation is implemented: constitution documents, a Go 1.26 module, minimal Linux amd64 CLI, smoke tests, and CI. Workflow state, integrations, and managed data remain unimplemented. Go 1.26.4 Linux amd64 is available. Git history confirms the accepted decisions; no contradiction or new blocking decision was found.
+Stage 0 is approved. Stage 1 is implemented and awaiting its human gate: Navigator transitions, root discovery, append-only journal replay, replaceable projection, canonical orientation/navigation operations, CLI projections, and recovery journeys are present. Templates and all integrations remain unimplemented.
 
 ## Architecture
 
@@ -12,8 +12,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 
 | Stage | Capability | Depends | Status |
 | --- | --- | --- | --- |
-| [0](stages/00-foundation.md) | Foundation and constitution | none | implemented; awaiting human gate |
-| [1](stages/01-navigator.md) | Navigator/orientation/recovery kernel | 0 | planned |
+| [0](stages/00-foundation.md) | Foundation and constitution | none | approved |
+| [1](stages/01-navigator.md) | Navigator/orientation/recovery kernel | 0 | implemented; awaiting human gate |
 | [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | planned |
 | [3](stages/03-codex.md) | Codex-native planning | 2 | planned |
 | [4](stages/04-claude-code.md) | Claude Code parity | 3 | planned |
@@ -45,14 +45,15 @@ Each stage requires implementation complete, focused tests, full affected suite,
 
 ## Next implementation task after the gate
 
-No Stage 1 implementation may begin until a human approves the Stage 0 gate. After approval, the next task is the first ordered task in [Stage 1](stages/01-navigator.md).
+Do not begin Stage 2 until a human approves the Stage 1 gate. After approval, the next task is S2-T1 in [Stage 2](stages/02-templates-okf.md).
 
-Stage 0 remains at its stop/go gate until then. Verify it with:
+Stage 1 remains at its stop/go gate until then. Verify it with:
 
 ```sh
-rg -n "Pathframe is a local, deterministic|The agent reasons" README.md PHILOSOPHY.md ARCHITECTURE.md
-rg -n "Go 1.26|Linux amd64|flag|stdio|approval|execution_policy|okf-markdown/v1|sequential|timeout|history.jsonl|Specd" README.md PHILOSOPHY.md ARCHITECTURE.md CONTRIBUTING.md AGENTS.md docs/decisions/README.md
-git diff --check
+go test ./internal/workflow ./internal/store ./internal/app ./internal/adapters/cli
+go test ./tests/journey -run Navigator
+go test ./...
+go vet ./...
 ```
 
-Acceptance: a cold contributor can state purpose, boundaries, supported platform, non-goals, and deviation process from these documents alone; the minimal CLI passes the Stage 0 checks without implementing workflow behavior.
+Acceptance: identical state yields identical legal actions; no-argument/status/next answer the five orientation questions; schemas and goldens match canonical results; every non-terminal phase has an executable recovery; complete journal replay deterministically rebuilds projections; no recovery deletes `.pathframe` or rewrites Git history.

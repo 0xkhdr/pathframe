@@ -31,6 +31,7 @@ These are not approval requests.
 | R-08 | Verification becomes stale after edits | Bind results to deterministic repository content identity | 7 |
 | R-09 | Go 1.26 unavailable in CI | Stage 0 gate fails; fix runner, do not lower version silently | 0 |
 | R-10 | Scope expands toward Specd | Constitution review and deviation record at every gate | all |
+| R-11 | Concurrent CLI writers can race between replay and append | Stage 1 is single-writer; diagnose an invalid chain without rewriting complete records; add cross-process serialization when concurrent mutation is in scope | 9 |
 
 ## New decisions requiring approval
 
@@ -39,4 +40,3 @@ None. Exact numeric defaults for output limits, timeouts, lease age, and context
 ## Deferred decisions
 
 Parallel Pinkies, strict Git evidence, importer creation, broader hosts, Streamable HTTP, and organization controls remain outside Stage 0–9 acceptance. Stage 9 may only recommend a read-only-source importer when real demand and representative fixtures exist.
-

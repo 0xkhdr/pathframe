@@ -1,5 +1,7 @@
 # Stage 1: Navigator Kernel and Orientation
 
+Status: implemented; awaiting human stop/go gate.
+
 ## Outcome and why now
 
 Deterministic project discovery, lifecycle navigation, persisted journal/projection, and recovery from every non-terminal state. Templates and integrations need stable operations first.
@@ -47,4 +49,3 @@ go vet ./...
 ## Acceptance and gate
 
 Same input state yields same legal actions; no-arg/status/next answer five orientation questions; schema validates; every non-terminal state completes one recovery journey; projection rebuild is deterministic; no recovery deletes `.pathframe`. Exit only after goldens, full suite, journey, docs, risks, and human stop/go.
-

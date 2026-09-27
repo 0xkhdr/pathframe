@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pathframe.dev/schemas/workflow-v1.schema.json",
+  "title": "Pathframe workflow orientation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "project_root", "configured", "progress", "recommended", "alternatives", "blockers", "diagnostics", "human_required"],
+  "properties": {
+    "schema": {"const": "pathframe.workflow/v1"},
+    "project_root": {"type": "string"},
+    "configured": {"type": "boolean"},
+    "change": {"type": "string", "minLength": 1},
+    "phase": {"enum": ["exploring", "planning", "ready", "executing", "reviewing", "blocked", "replanning", "done", "paused", "cancelled"]},
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completed", "total"],
+      "properties": {"completed": {"type": "integer", "minimum": 0}, "total": {"type": "integer", "minimum": 0}}
+    },
+    "recommended": {"$ref": "#/$defs/action"},
+    "alternatives": {"type": "array", "items": {"$ref": "#/$defs/action"}},
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message", "recovery"],
+        "properties": {"code": {"type": "string"}, "message": {"type": "string"}, "recovery": {"type": "array", "items": {"$ref": "#/$defs/action"}}}
+      }
+    },
+    "diagnostics": {"type": "array", "items": {"type": "string"}},
+    "human_required": {"type": "boolean"}
+  },
+  "$defs": {
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action"],
+      "properties": {"action": {"enum": ["", "orient", "plan", "approve", "execute", "review", "complete", "block", "pause", "resume", "replan", "cancel", "select_change"]}}
+    }
+  }
+}
