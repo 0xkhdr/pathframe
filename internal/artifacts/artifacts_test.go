@@ -8,6 +8,18 @@ import (
 	"testing"
 )
 
+func TestSecurityRejectsMalformedArtifact(t *testing.T) {
+	for _, data := range [][]byte{
+		[]byte("not front matter"),
+		[]byte("---\nschema: one\nschema: two\n---\n"),
+		[]byte("---\nschema: one\n"),
+	} {
+		if _, err := ParseBytes("untrusted.md", data); err == nil {
+			t.Fatalf("ParseBytes accepted %q", data)
+		}
+	}
+}
+
 func TestStageTwoSchemasAreValidJSON(t *testing.T) {
 	for _, name := range []string{"artifact-instructions-v1.schema.json", "change-v1.schema.json", "plan-check-v1.schema.json", "plan-approval-v1.schema.json", "intent-v1.schema.json", "requirements-v1.schema.json", "design-v1.schema.json", "task-v1.schema.json", "role-v1.schema.json", "task-packet-v1.schema.json", "risks-v1.schema.json", "rollout-v1.schema.json", "recovery-v1.schema.json"} {
 		data, err := os.ReadFile(filepath.Join("..", "..", "schemas", name))

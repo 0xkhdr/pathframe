@@ -38,6 +38,9 @@ These are not approval requests.
 | R-15 | Worker or verification output grows without bound | Stage 6 rejects task results above 256 KiB; Stage 7 independently bounds stdout and stderr with explicit truncation | 6/7 |
 | R-16 | Repository content changes after a passing verification | Stage 7 binds verification to a deterministic relevant-content identity and refuses stale semantic acceptance | 7 |
 | R-17 | Replanning invalidates already accepted work | Stage 8 binds completion to normalized task-contract identity; unchanged tasks remain complete and changed tasks return to the frontier | 8 |
+| R-18 | Cross-build success is mistaken for platform support | Compatibility docs claim only Linux amd64; every other target requires native clean-install and complete-journey CI before promotion | 9 |
+| R-19 | Installer interruption replaces a working binary with a partial file | Stage beside the destination and atomically rename only after copy and permission checks; failed pre-rename updates leave the prior binary intact | 9 |
+| R-20 | Host releases drift beyond repository fixtures | Versioned manifests and Doctor checks remain the support boundary; rerun host journeys after updates and reduce claims on failure | 9 |
 
 ## New decisions requiring approval
 

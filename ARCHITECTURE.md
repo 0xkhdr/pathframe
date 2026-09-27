@@ -88,6 +88,10 @@ The `verification` domain validates project-contained working directories, execu
 
 The `recovery` domain owns typed diagnosis, deterministic projection comparison/rebuild, abandoned-lease classification, and normalized task-contract identity. `app.Doctor` composes owning validators and exposes read-only preview plus narrowly safe repair through CLI and MCP. Authored artifacts and complete journal/run records are never machine-repaired. Cancellation and lease recovery retain append-only run evidence, while replanning preserves only completions whose task contracts remain unchanged.
 
+## Stage 9 hardening and support boundary
+
+Linux amd64 is the only supported production platform because it has native CI, installation, and complete sequential journey evidence. Other named targets are cross-build-only portability targets. The repository installer atomically replaces only the executable and never touches project state. Security tests cover managed-directory and context symlinks, portable result paths, and literal structured argv execution. Performance benchmarks cover discovery, plan validation, and packet assembly. No new lifecycle contract, Specd compatibility, parallel worker, or release/deployment subsystem was added.
+
 ## Legacy reuse rule
 
 Pathframe is a fresh project, not Specd renamed. Do not copy legacy code until a scoped task traces its actual behavior and tests, confirms license and architectural fit, and records why reuse is smaller and safer than a fresh implementation.

@@ -64,3 +64,16 @@ func TestIdentityAndScope(t *testing.T) {
 		t.Fatalf("violations = %#v", violations)
 	}
 }
+
+func TestSecurityRunDoesNotInterpretShellSyntax(t *testing.T) {
+	root := t.TempDir()
+	marker := filepath.Join(root, "injected")
+	argument := "$(touch " + marker + ")"
+	result := Run(context.Background(), root, Command{Argv: []string{"printf", "%s", argument}, Workdir: ".", Timeout: time.Second, MaxBytes: 1024})
+	if result.ExitCode != 0 || result.Stdout != argument {
+		t.Fatalf("structured argv result = %#v", result)
+	}
+	if _, err := os.Stat(marker); !os.IsNotExist(err) {
+		t.Fatalf("shell syntax executed: %v", err)
+	}
+}

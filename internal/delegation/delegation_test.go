@@ -63,3 +63,15 @@ func TestAllWorkerStatusesAndMalformedResult(t *testing.T) {
 		t.Fatal("escaping changed file was accepted")
 	}
 }
+
+func TestSecurityResultRejectsPortablePathTraversal(t *testing.T) {
+	lease := Lease{ID: "lease", Change: "demo", Task: "T1"}
+	base := Result{Schema: ResultSchema, LeaseID: lease.ID, Change: lease.Change, Task: lease.Task, Status: ResultCompleted, Summary: "done"}
+	for _, path := range []string{"../escape", `..\escape`, "/absolute"} {
+		result := base
+		result.ChangedFiles = []string{path}
+		if err := ValidateResult(result, lease); err == nil {
+			t.Fatalf("ValidateResult accepted %q", path)
+		}
+	}
+}

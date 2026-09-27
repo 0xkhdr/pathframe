@@ -1,5 +1,7 @@
 # Stage 9: Full Product Hardening
 
+Status: implemented; awaiting human gate (2026-09-28)
+
 ## Outcome and why now
 
 Sequential Pathframe is installable, secure, measured, documented, and supported only on platforms proven by CI and complete journeys.
@@ -27,6 +29,15 @@ No new lifecycle contract expected. Claim Linux arm64, macOS amd64/arm64, or Win
 
 Platform jobs are a readiness wave, not concurrent repository mutation. Each task gets relevant platform/config/test context only.
 
+Implementation evidence:
+
+- S9-T1: named security tests cover managed-directory/context/workdir symlink escape, portable changed-file traversal, bounded malformed records, and literal argv without shell interpretation; `docs/security.md` records the threat boundary.
+- S9-T2: `tests/benchmarks` enforces average local budgets of 10 ms for discovery, 25 ms for validation, and 2 ms for packet assembly, and emits benchmark evidence for release review.
+- S9-T3: `scripts/install.sh` provides atomic Linux install/update and binary-only uninstall; `tests/install` proves clean install, update, failed-update preservation, symlink refusal, and uninstall.
+- S9-T4: CI runs native Linux amd64 verification and journeys, plus cross-build-only portability checks for the other named targets.
+- S9-T5: installation, onboarding, compatibility, security, limitations, and support documents match the evidence-based support boundary.
+- S9-T6: `docs/decisions/0001-no-specd-importer.md` records the evidence review; `docs/release.md` defines the human-gated release checklist.
+
 ## Tests and recovery
 
 Race/full tests, malformed inputs, symlink/path traversal, command injection attempts, update rollback, interrupted install, clean machine, and full create/execute/interrupt/recover journey on each claimed platform. Failed platform evidence leaves it a target, not supported. Failed update restores prior binary/config while preserving `.pathframe`.
@@ -52,4 +63,3 @@ CI runs equivalent platform-specific commands and end-to-end journeys.
 ## Acceptance and gate
 
 Every claimed platform passes clean install and full sequential journey; budgets pass; security findings are resolved/accepted; docs match behavior; Codex/Claude matrix is current; no Specd compatibility exists unless a separately approved evidence-backed task was created; limitations are explicit. Stable release requires human go decision.
-

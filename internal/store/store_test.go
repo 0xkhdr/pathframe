@@ -9,6 +9,16 @@ import (
 	"github.com/0xkhdr/pathframe/internal/workflow"
 )
 
+func TestSecurityRejectsMalformedJournalRecord(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "history.jsonl")
+	if err := os.WriteFile(path, []byte("{}\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ReadJournal(path); err == nil {
+		t.Fatal("ReadJournal accepted a malformed event")
+	}
+}
+
 func TestDiscoverAndRejectEscapes(t *testing.T) {
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, ".pathframe", "changes", "good", "nested"), 0o755); err != nil {

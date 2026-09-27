@@ -29,6 +29,12 @@ func (s Service) CreateChange(change string, mode artifacts.Mode) (artifacts.Che
 		if err != nil {
 			return artifacts.CheckResult{}, err
 		}
+		managed := filepath.Join(root, ".pathframe")
+		if info, statErr := os.Lstat(managed); statErr == nil && info.Mode()&os.ModeSymlink != 0 {
+			return artifacts.CheckResult{}, errors.New("managed directory must not be a symlink")
+		} else if statErr != nil && !errors.Is(statErr, os.ErrNotExist) {
+			return artifacts.CheckResult{}, statErr
+		}
 		if err = os.MkdirAll(filepath.Join(root, ".pathframe", "changes"), 0o755); err != nil {
 			return artifacts.CheckResult{}, err
 		}

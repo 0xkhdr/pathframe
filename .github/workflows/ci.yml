@@ -22,5 +22,41 @@ jobs:
         run: go vet ./...
       - name: Test
         run: go test ./...
+      - name: Race test
+        run: go test -race ./...
+      - name: Stage 9 journeys
+        run: go test ./... -run Journey
+      - name: Security suite
+        run: go test ./... -run Security
+      - name: Install suite
+        run: go test ./... -run Install
+      - name: Performance evidence
+        run: go test ./... -bench 'Discovery|Validation|Packet' -run '^$' -benchtime=100x
       - name: Build Linux amd64
-        run: GOOS=linux GOARCH=amd64 go build ./cmd/pathframe
+        run: GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-X github.com/0xkhdr/pathframe/internal/app.Version=ci" ./cmd/pathframe
+
+  portability-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+          - goos: windows
+            goarch: amd64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Cross-build portability target
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: go build -trimpath ./cmd/pathframe

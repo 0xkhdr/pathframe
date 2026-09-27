@@ -2,7 +2,7 @@
 
 ## Current state
 
-Stages 0 through 7 are approved. Stage 8 is implemented and awaiting its human gate: typed diagnosis, safe projection reconstruction, abandoned-lease recovery, replan-aware completion preservation, and retained cancellation history are present.
+Stages 0 through 8 are approved. Stage 9 is implemented and awaiting its human gate: Linux amd64 install/support evidence, security and performance suites, portability cross-builds, onboarding, release guidance, and explicit limitations are present.
 
 ## Architecture
 
@@ -20,8 +20,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 | [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | approved |
 | [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | approved |
 | [7](stages/07-verification-completion.md) | Verification and completion | 6 | approved |
-| [8](stages/08-doctor-recovery.md) | Complete Doctor/recovery | 7 | implemented; awaiting human gate |
-| [9](stages/09-hardening.md) | Adoption hardening and platform proof | 8 | planned |
+| [8](stages/08-doctor-recovery.md) | Complete Doctor/recovery | 7 | approved |
+| [9](stages/09-hardening.md) | Adoption hardening and platform proof | 8 | implemented; awaiting human gate |
 
 Stages do not overlap gates. Waves show readiness only, not permission for unsafe concurrent mutation. Parallel Pinkies remain deferred beyond Stage 9.
 
@@ -43,17 +43,24 @@ Go 1.26/Linux amd64 first; standard-library `flag`; official MCP SDK via stdio; 
 
 Each stage requires implementation complete, focused tests, full affected suite, demonstrated journey, aligned docs, recorded risks, and human stop/go. No later stage starts with unresolved acceptance failures. Every non-terminal state needs an executable recovery. No recovery depends on deletion or Git rewriting.
 
-## Next implementation task after the gate
+## Current gate
 
-Do not begin Stage 9 until a human approves the Stage 8 gate. After approval, the next task is S9-T1 in [Stage 9](stages/09-hardening.md).
-
-Stage 8 remains at its stop/go gate until then. Verify it with:
+Do not begin post-Stage-9 work until a human approves the stable-release gate. Verify Stage 9 with:
 
 ```sh
-go test ./internal/recovery ./internal/store ./internal/app
-go test ./tests/journey -run 'Doctor|Recovery|Interrupted|Replan'
-go test ./...
+test -z "$(gofmt -l .)"
 go vet ./...
+go test -race ./...
+go test ./... -run Journey
+go test ./... -run Security
+go test ./... -run Install
+go test ./... -bench 'Discovery|Validation|Packet' -run '^$'
+GOOS=linux GOARCH=amd64 go build ./cmd/pathframe
+GOOS=linux GOARCH=arm64 go build ./cmd/pathframe
+GOOS=darwin GOARCH=amd64 go build ./cmd/pathframe
+GOOS=darwin GOARCH=arm64 go build ./cmd/pathframe
+GOOS=windows GOARCH=amd64 go build ./cmd/pathframe
+git diff --check
 ```
 
-Acceptance: every named failure has an executable recovery; projection rebuild is deterministic; abandoned work releases and retries without policy fallback; unaffected completions survive replan; cancellation retains history; repair never edits authored intent or rewrites Git.
+Acceptance: Linux amd64 passes clean install and the full sequential journey; budgets and security checks pass; documentation matches behavior; other systems remain targets until native install/journey evidence exists; no Specd compatibility exists; limitations are explicit. Stable release requires a human go decision.

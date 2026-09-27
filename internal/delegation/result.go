@@ -54,7 +54,7 @@ func ValidateResult(result Result, lease Lease) error {
 	}
 	for _, name := range result.ChangedFiles {
 		clean := filepath.Clean(name)
-		if name == "" || filepath.IsAbs(clean) || clean == "." || clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
+		if name == "" || strings.Contains(name, `\`) || filepath.IsAbs(clean) || clean == "." || clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
 			return fmt.Errorf("changed file escapes the project: %q", name)
 		}
 	}

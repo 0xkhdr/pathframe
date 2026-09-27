@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,6 +10,20 @@ import (
 	"github.com/0xkhdr/pathframe/internal/artifacts"
 	"github.com/0xkhdr/pathframe/internal/workflow"
 )
+
+func TestSecurityCreateRejectsManagedDirectorySymlink(t *testing.T) {
+	root := t.TempDir()
+	outside := t.TempDir()
+	if err := os.Symlink(outside, filepath.Join(root, ".pathframe")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := (Service{Dir: root}).CreateChange("escape", artifacts.Quick); err == nil {
+		t.Fatal("CreateChange accepted a symlinked managed directory")
+	}
+	if _, err := os.Stat(filepath.Join(outside, "changes")); !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("outside directory changed: %v", err)
+	}
+}
 
 func TestApprovalBindsIdentityAndMaterialEditInvalidates(t *testing.T) {
 	root := t.TempDir()
