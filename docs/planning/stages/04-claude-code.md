@@ -46,3 +46,4 @@ go test ./...
 
 Both hosts pass same planning semantics and resume journey; differences are explicit capabilities; no lifecycle logic is duplicated; broken config yields actionable diagnosis. Human stop/go before packet work.
 
+Implementation evidence: Claude Code uses project-native `.claude/skills/pathframe/SKILL.md`, `.claude/commands/pathframe.md`, and `.mcp.json`. Optional orientation uses only the supported `SessionStart` command hook in `.claude/settings.json`, calling canonical `status --json`. Manifest hashes protect user content during install/update; Doctor reports actionable drift. Both hosts share the same activation fixtures and MCP/application planning operations.

@@ -6,7 +6,7 @@
   "properties": {
     "schema": {"const": "pathframe.integration/v1"},
     "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
-    "host": {"const": "codex"},
+    "host": {"enum": ["codex", "claude-code"]},
     "transport": {"const": "stdio"},
     "capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "files": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}

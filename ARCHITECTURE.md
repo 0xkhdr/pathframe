@@ -68,6 +68,10 @@ The `artifacts` domain owns the strict, flat-front-matter `okf-markdown/v1` prof
 
 The Codex generator owns repository skill, project MCP configuration, optional `SessionStart` orientation, and `pathframe.integration/v1`. The MCP adapter alone imports the pinned official SDK and exposes only typed planning operations backed by `internal/app`. Request classification remains Brain reasoning; the application operation deterministically maps classified facts to `must_use`, `offer`, or `must_not_use`. Explicit approval is handed back through the typed validation operation only after the human approves. Generated assets are updated only when their manifest hash proves Pathframe ownership.
 
+## Stage 4 Claude Code planning integration
+
+The Claude Code generator owns a project skill, slash command, `.mcp.json`, optional supported `SessionStart` command hook, and a host-specific `pathframe.integration/v1` manifest. These assets call the same typed MCP and canonical application operations as Codex. Hash ownership makes install/update non-destructive, and host-specific Doctor checks report drift without editing workflow artifacts.
+
 ## Legacy reuse rule
 
 Pathframe is a fresh project, not Specd renamed. Do not copy legacy code until a scoped task traces its actual behavior and tests, confirms license and architectural fit, and records why reuse is smaller and safer than a fresh implementation.

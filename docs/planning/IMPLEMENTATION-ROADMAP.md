@@ -2,7 +2,7 @@
 
 ## Current state
 
-Stages 0 through 2 are approved. Stage 3 is implemented and awaiting its human gate: generated Codex guidance/configuration, activation rules/evaluations, typed local-stdio MCP planning operations, a versioned integration manifest, optional session-start orientation, diagnosis, fixtures, and journeys are present. Later integrations and execution capabilities remain unimplemented.
+Stages 0 through 3 are approved. Stage 4 is implemented and awaiting its human gate: Claude Code guidance, command, project MCP configuration, optional supported session-start hook, manifest-owned safe updates, diagnosis, shared activation fixtures, and planning/resume journeys are present. Execution capabilities remain unimplemented.
 
 ## Architecture
 
@@ -15,8 +15,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 | [0](stages/00-foundation.md) | Foundation and constitution | none | approved |
 | [1](stages/01-navigator.md) | Navigator/orientation/recovery kernel | 0 | approved |
 | [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | approved |
-| [3](stages/03-codex.md) | Codex-native planning | 2 | implemented; awaiting human gate |
-| [4](stages/04-claude-code.md) | Claude Code parity | 3 | planned |
+| [3](stages/03-codex.md) | Codex-native planning | 2 | approved |
+| [4](stages/04-claude-code.md) | Claude Code parity | 3 | implemented; awaiting human gate |
 | [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | planned |
 | [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | planned |
 | [7](stages/07-verification-completion.md) | Verification and completion | 6 | planned |
@@ -45,15 +45,15 @@ Each stage requires implementation complete, focused tests, full affected suite,
 
 ## Next implementation task after the gate
 
-Do not begin Stage 4 until a human approves the Stage 3 gate. After approval, the next task is S4-T1 in [Stage 4](stages/04-claude-code.md).
+Do not begin Stage 5 until a human approves the Stage 4 gate. After approval, the next task is S5-T1 in [Stage 5](stages/05-context-and-roles.md).
 
-Stage 3 remains at its stop/go gate until then. Verify it with:
+Stage 4 remains at its stop/go gate until then. Verify it with:
 
 ```sh
-go test ./internal/adapters/mcp ./internal/integrations/codex ./internal/app
-go test ./tests/journey -run CodexPlanning
+go test ./internal/integrations/claude ./internal/adapters/mcp ./internal/app
+go test ./tests/journey -run ClaudePlanning
 go test ./...
 go vet ./...
 ```
 
-Acceptance: Codex completes request-to-ready through typed tools; activation classes pass; a fresh session resumes canonical state; CLI and MCP project the same contracts; the official SDK remains confined to the MCP adapter; no raw command tool, Claude support, or delegation is present.
+Acceptance: both hosts complete the same request-to-ready semantics through typed tools; shared activation classes pass; fresh sessions resume canonical state; Claude host differences are explicit; broken generated configuration is actionable; no lifecycle logic is duplicated and no Stage 5 capability is present.
