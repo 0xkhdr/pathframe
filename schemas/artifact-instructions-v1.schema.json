@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://pathframe.dev/schemas/artifact-instructions-v1.schema.json","type":"object","required":["schema","profile","mode","artifact","required_fields","required_sections","rules"]}

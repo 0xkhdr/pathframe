@@ -31,7 +31,7 @@ var allowedActors = map[Action]map[Actor]bool{
 	ActionBlock:      {ActorBrain: true, ActorPinky: true, ActorSystem: true},
 	ActionPause:      {ActorHuman: true},
 	ActionResume:     {ActorHuman: true},
-	ActionReplan:     {ActorHuman: true, ActorBrain: true},
+	ActionReplan:     {ActorHuman: true, ActorBrain: true, ActorSystem: true},
 	ActionCancel:     {ActorHuman: true},
 }
 
@@ -59,7 +59,7 @@ func Apply(state State, action Action, actor Actor) (State, error) {
 		if state.Phase == PhaseReplanning {
 			return state, rejected(state, ReasonIllegalTransition, "change is already replanning")
 		}
-		next.Phase, next.ResumePhase = PhaseReplanning, ""
+		next.Phase, next.ResumePhase, next.PlanIdentity = PhaseReplanning, "", ""
 	case ActionCancel:
 		next.Phase, next.ResumePhase = PhaseCancelled, ""
 	default:

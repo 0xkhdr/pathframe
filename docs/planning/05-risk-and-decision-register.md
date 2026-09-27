@@ -22,7 +22,7 @@ These are not approval requests.
 | ID | Risk | Mitigation / recovery | First gate |
 | --- | --- | --- | --- |
 | R-01 | Host formats/capabilities drift | Version manifests, fixtures, Doctor blocker; update adapter only | 3 |
-| R-02 | Parser accepts ambiguous Markdown | Small profile, strict front matter/headings, golden negative fixtures | 2 |
+| R-02 | Parser accepts ambiguous Markdown | Stage 2 uses flat strict front matter, exact headings, structured verification, and negative fixtures; profile changes remain versioned | 2 |
 | R-03 | Journal append interrupted | Ignore/diagnose incomplete final record; replay prior complete events | 1/8 |
 | R-04 | Projection diverges | Compare replay identity; Doctor rebuilds machine projection | 1/8 |
 | R-05 | Path/symlink escape | Resolve against project root and reject escapes before I/O/exec | 0/7 |

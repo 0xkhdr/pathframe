@@ -10,11 +10,21 @@
       "action": "cancel"
     }
   ],
-  "blockers": [],
+  "blockers": [
+    {
+      "code": "artifacts_missing",
+      "message": "planning artifacts are not initialized",
+      "recovery": [
+        {
+          "action": "new"
+        }
+      ]
+    }
+  ],
   "change": "demo",
   "configured": true,
   "diagnostics": [],
-  "human_required": false,
+  "human_required": true,
   "phase": "exploring",
   "progress": {
     "completed": 0,
@@ -22,7 +32,7 @@
   },
   "project_root": "ROOT",
   "recommended": {
-    "action": "plan"
+    "action": "new"
   },
   "schema": "pathframe.workflow/v1"
 }

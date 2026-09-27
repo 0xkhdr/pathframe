@@ -8,13 +8,13 @@ Pathframe will give humans and coding agents one local view of current work: whe
 
 ## Project status
 
-Pathframe Stage 1 is implemented and awaiting its human stop/go gate. The repository now contains the deterministic Navigator kernel, journal replay and replaceable state projection, orientation/navigation operations, recovery transitions, and text/JSON CLI views.
+Pathframe Stage 2 is implemented and awaiting its human stop/go gate. It adds the Pathframe-owned `okf-markdown/v1` profile, progressive Quick/Standard/High-risk artifacts, task-per-file validation, canonical create/template/check/approval operations, and material-change reapproval over the Stage 1 Navigator.
 
 The first supported production platform will be Linux amd64 with Go 1.26. Linux arm64, macOS amd64/arm64, and Windows amd64 remain portability targets until Stage 9 proves them through CI and end-to-end journeys.
 
 ## Intended first use
 
-Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. See the [CLI reference](docs/CLI.md). Later stages will add progressively rigorous planning artifacts, typed Codex and Claude Code integrations, bounded sequential delegation, verification, and broader Doctor recovery.
+Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. See the [CLI reference](docs/CLI.md) and [artifact profile](docs/ARTIFACTS.md). Later stages will add typed Codex and Claude Code integrations, bounded sequential delegation, verification execution, and broader Doctor recovery.
 
 ## Boundaries
 

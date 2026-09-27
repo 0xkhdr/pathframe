@@ -2,7 +2,7 @@
 
 ## Current state
 
-Stage 0 is approved. Stage 1 is implemented and awaiting its human gate: Navigator transitions, root discovery, append-only journal replay, replaceable projection, canonical orientation/navigation operations, CLI projections, and recovery journeys are present. Templates and all integrations remain unimplemented.
+Stages 0 and 1 are approved. Stage 2 is implemented and awaiting its human gate: the owned OKF profile, progressive artifact templates, task parsing and validation, create/template/check/approval operations, material identity invalidation, fixtures, CLI projections, and journeys are present. Integrations remain unimplemented.
 
 ## Architecture
 
@@ -13,8 +13,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 | Stage | Capability | Depends | Status |
 | --- | --- | --- | --- |
 | [0](stages/00-foundation.md) | Foundation and constitution | none | approved |
-| [1](stages/01-navigator.md) | Navigator/orientation/recovery kernel | 0 | implemented; awaiting human gate |
-| [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | planned |
+| [1](stages/01-navigator.md) | Navigator/orientation/recovery kernel | 0 | approved |
+| [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | implemented; awaiting human gate |
 | [3](stages/03-codex.md) | Codex-native planning | 2 | planned |
 | [4](stages/04-claude-code.md) | Claude Code parity | 3 | planned |
 | [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | planned |
@@ -45,15 +45,15 @@ Each stage requires implementation complete, focused tests, full affected suite,
 
 ## Next implementation task after the gate
 
-Do not begin Stage 2 until a human approves the Stage 1 gate. After approval, the next task is S2-T1 in [Stage 2](stages/02-templates-okf.md).
+Do not begin Stage 3 until a human approves the Stage 2 gate. After approval, the next task is S3-T1 in [Stage 3](stages/03-codex.md).
 
-Stage 1 remains at its stop/go gate until then. Verify it with:
+Stage 2 remains at its stop/go gate until then. Verify it with:
 
 ```sh
-go test ./internal/workflow ./internal/store ./internal/app ./internal/adapters/cli
-go test ./tests/journey -run Navigator
+go test ./internal/artifacts ./internal/app ./internal/adapters/cli
+go test ./tests/journey -run 'Quick|Standard|HighRisk|Approval'
 go test ./...
 go vet ./...
 ```
 
-Acceptance: identical state yields identical legal actions; no-argument/status/next answer the five orientation questions; schemas and goldens match canonical results; every non-terminal phase has an executable recovery; complete journal replay deterministically rebuilds projections; no recovery deletes `.pathframe` or rewrites Git history.
+Acceptance: every mode generates only required files; Quick has no unused mandatory artifact; instructions are self-contained; every plan needs explicit human approval; material edits invalidate approval; validation failures name executable recovery; Aido absence changes nothing.

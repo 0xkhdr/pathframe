@@ -60,6 +60,10 @@ The Navigator domain owns phase/task-state transition tables and deterministic l
 
 Stage 1 does not implement authored artifacts, templates, approval workflows, MCP, delegation, or verification execution. Those remain gated by later stages.
 
+## Stage 2 artifacts and approval
+
+The `artifacts` domain owns the strict, flat-front-matter `okf-markdown/v1` profile, embedded templates, parsing, validation, task-per-file contracts, and normalized material identity. Quick requires intent and tasks; Standard adds requirements and design; High-risk adds risks, rollout, and recovery. The application layer owns create, template, check, and explicit human approval operations. Approval is a journal transition bound to the validated identity; canonical orientation detects a material mismatch and journals recovery to `replanning`. Authored files are preserved. CLI remains a projection of these operations. No host, MCP, delegation, context, Aido, or verification execution boundary was added.
+
 ## Legacy reuse rule
 
 Pathframe is a fresh project, not Specd renamed. Do not copy legacy code until a scoped task traces its actual behavior and tests, confirms license and architectural fit, and records why reuse is smaller and safer than a fresh implementation.

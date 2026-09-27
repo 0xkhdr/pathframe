@@ -81,6 +81,7 @@ const (
 	ActionReplan     Action = "replan"
 	ActionCancel     Action = "cancel"
 	ActionSelect     Action = "select_change"
+	ActionNew        Action = "new"
 )
 
 type ReasonCode string
@@ -95,14 +96,17 @@ const (
 	ReasonAmbiguousChange   ReasonCode = "ambiguous_change"
 	ReasonCorruptProjection ReasonCode = "corrupt_projection"
 	ReasonIncompleteTail    ReasonCode = "incomplete_journal_tail"
+	ReasonArtifactsMissing  ReasonCode = "artifacts_missing"
 )
 
 type State struct {
-	Change      string `json:"change"`
-	Phase       Phase  `json:"phase"`
-	ResumePhase Phase  `json:"resume_phase,omitempty"`
-	Completed   int    `json:"completed"`
-	Total       int    `json:"total"`
+	Change       string `json:"change"`
+	Phase        Phase  `json:"phase"`
+	ResumePhase  Phase  `json:"resume_phase,omitempty"`
+	PlanIdentity string `json:"plan_identity,omitempty"`
+	PlanMode     string `json:"plan_mode,omitempty"`
+	Completed    int    `json:"completed"`
+	Total        int    `json:"total"`
 }
 
 type ActionResult struct {

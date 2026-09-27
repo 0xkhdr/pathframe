@@ -1,0 +1,4 @@
+schema: pathframe.change/v1
+profile: okf-markdown/v1
+id: standard
+mode: standard

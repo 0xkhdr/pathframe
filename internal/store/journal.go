@@ -17,16 +17,18 @@ import (
 const EventSchema = "pathframe.transition/v1"
 
 type Event struct {
-	Schema    string          `json:"schema"`
-	ID        string          `json:"id"`
-	Timestamp time.Time       `json:"timestamp"`
-	Actor     workflow.Actor  `json:"actor"`
-	Action    workflow.Action `json:"action"`
-	Change    string          `json:"change"`
-	Source    workflow.Phase  `json:"source,omitempty"`
-	Target    workflow.Phase  `json:"target"`
-	Resume    workflow.Phase  `json:"resume_phase,omitempty"`
-	Reason    string          `json:"reason,omitempty"`
+	Schema       string          `json:"schema"`
+	ID           string          `json:"id"`
+	Timestamp    time.Time       `json:"timestamp"`
+	Actor        workflow.Actor  `json:"actor"`
+	Action       workflow.Action `json:"action"`
+	Change       string          `json:"change"`
+	Source       workflow.Phase  `json:"source,omitempty"`
+	Target       workflow.Phase  `json:"target"`
+	Resume       workflow.Phase  `json:"resume_phase,omitempty"`
+	Reason       string          `json:"reason,omitempty"`
+	PlanIdentity string          `json:"plan_identity,omitempty"`
+	PlanMode     string          `json:"plan_mode,omitempty"`
 }
 
 type Replay struct {
@@ -104,6 +106,10 @@ func ReadJournal(path string) (Replay, error) {
 					return Replay{}, fmt.Errorf("journal record %d contains an illegal transition", result.Events+1)
 				}
 				result.State = next
+				if event.Action == workflow.ActionApprove {
+					result.State.PlanIdentity = event.PlanIdentity
+					result.State.PlanMode = event.PlanMode
+				}
 			}
 			result.Events++
 			result.CompleteBytes += int64(len(line))

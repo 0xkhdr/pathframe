@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/0xkhdr/pathframe/internal/artifacts"
 	"github.com/0xkhdr/pathframe/internal/store"
 	"github.com/0xkhdr/pathframe/internal/workflow"
 )
@@ -54,6 +55,36 @@ func (s Service) Orient(change string) (workflow.Result, error) {
 	replay, err := store.ReplayAndRepair(dir)
 	if err != nil {
 		return workflow.Result{}, err
+	}
+	if _, statErr := os.Stat(filepath.Join(dir, "change.yaml")); errors.Is(statErr, os.ErrNotExist) {
+		view := result(root, replay.State, replay.Diagnostics)
+		view.Blockers = []workflow.Blocker{{Code: workflow.ReasonArtifactsMissing, Message: "planning artifacts are not initialized", Recovery: []workflow.ActionResult{{Action: workflow.ActionNew}}}}
+		view.Recommended = workflow.ActionResult{Action: workflow.ActionNew}
+		view.HumanRequired = true
+		return view, nil
+	} else if statErr != nil {
+		return workflow.Result{}, statErr
+	}
+	if replay.State.PlanIdentity != "" && !replay.State.Phase.Terminal() {
+		plan, issues := artifacts.Validate(dir)
+		if len(issues) > 0 || plan.Identity != replay.State.PlanIdentity {
+			before := replay.State
+			after, applyErr := workflow.Apply(before, workflow.ActionReplan, workflow.ActorSystem)
+			if applyErr != nil {
+				return workflow.Result{}, applyErr
+			}
+			event, eventErr := store.NewEvent(before, after, workflow.ActionReplan, workflow.ActorSystem, "material plan change invalidated approval")
+			if eventErr != nil {
+				return workflow.Result{}, eventErr
+			}
+			if appendErr := store.Append(filepath.Join(dir, "history.jsonl"), event); appendErr != nil {
+				return workflow.Result{}, appendErr
+			}
+			replay, err = store.ReplayAndRepair(dir)
+			if err != nil {
+				return workflow.Result{}, err
+			}
+		}
 	}
 	return result(root, replay.State, replay.Diagnostics), nil
 }

@@ -1,5 +1,7 @@
 # Stage 2: Templates and OKF Profile
 
+Status: implemented; awaiting human stop/go gate.
+
 ## Outcome and why now
 
 Self-describing Quick, Standard, and High-risk artifacts validate into an explicitly approved ready plan. Navigator operations already provide state and recovery.
@@ -46,4 +48,3 @@ go test ./...
 ## Acceptance and gate
 
 All modes generate only required files; Quick has no unused mandatory artifact; instructions suffice for a cold agent; every plan needs explicit human approval; material edits invalidate approval; Aido absence changes nothing; validation failures have executable recovery. Human approves profile usability before Stage 3.
-

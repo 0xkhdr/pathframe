@@ -4,7 +4,7 @@ Configured: true
 Active change: demo
 Phase: exploring
 Progress: 0/0 tasks complete
-Blocked: no
-Recommended next action: plan
+Blocked: planning artifacts are not initialized (artifacts_missing)
+Recommended next action: new
 Other legal actions: pause, replan, cancel
-Human action required: false
+Human action required: true

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/0xkhdr/pathframe/internal/app"
+	"github.com/0xkhdr/pathframe/internal/artifacts"
 	"github.com/0xkhdr/pathframe/internal/workflow"
 )
 
@@ -45,11 +46,37 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	commandFlags.SetOutput(stderr)
 	commandJSON := commandFlags.Bool("json", *jsonView, "render canonical JSON")
 	commandChange := commandFlags.String("change", *change, "select a change")
+	commandMode := commandFlags.String("mode", "quick", "planning mode: quick, standard, or high-risk")
+	commandArtifact := commandFlags.String("artifact", "task", "artifact kind")
 	if err := commandFlags.Parse(remaining); err != nil || commandFlags.NArg() != 0 {
 		return 2
 	}
 
 	service := app.Service{Dir: "."}
+	if command == "new" {
+		result, err := service.CreateChange(*commandChange, artifacts.Mode(*commandMode))
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
+	if command == "template" {
+		instructions, template, err := service.Template(artifacts.Mode(*commandMode), *commandArtifact)
+		if err != nil {
+			fmt.Fprintf(stderr, "pathframe: %v\n", err)
+			return 1
+		}
+		if *commandJSON {
+			return renderJSON(stdout, stderr, instructions)
+		}
+		fmt.Fprint(stdout, template)
+		return 0
+	}
+	if command == "check" {
+		result, err := service.Check(*commandChange)
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, false, err)
+	}
+	if command == "approve" {
+		result, err := service.Approve(*commandChange)
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
 	var result workflow.Result
 	var err error
 	switch command {
@@ -75,6 +102,45 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	}
 	if err != nil {
 		fmt.Fprintf(stderr, "pathframe: %v\n", err)
+		return 1
+	}
+	return 0
+}
+
+func renderArtifactResult(w, errw io.Writer, value any, jsonView, allowInvalid bool, operationErr error) int {
+	if jsonView {
+		if code := renderJSON(w, errw, value); code != 0 {
+			return code
+		}
+	} else {
+		switch result := value.(type) {
+		case artifacts.CheckResult:
+			fmt.Fprintf(w, "Change: %s\nMode: %s\nValid: %t\n", result.Change, result.Mode, result.Valid)
+			if result.Identity != "" {
+				fmt.Fprintf(w, "Plan identity: %s\n", result.Identity)
+			}
+			for _, issue := range result.Issues {
+				fmt.Fprintf(w, "Issue: %s: %s (%s)\n", issue.Path, issue.Message, issue.Code)
+			}
+		case artifacts.ApprovalResult:
+			fmt.Fprintf(w, "Change: %s\nMode: %s\nPhase: %s\nPlan identity: %s\n", result.Change, result.Mode, result.Phase, result.Identity)
+		}
+	}
+	if operationErr != nil {
+		fmt.Fprintf(errw, "pathframe: %v\n", operationErr)
+		return 1
+	}
+	if result, ok := value.(artifacts.CheckResult); ok && !result.Valid && !allowInvalid {
+		return 1
+	}
+	return 0
+}
+
+func renderJSON(w, errw io.Writer, value any) int {
+	encoder := json.NewEncoder(w)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(value); err != nil {
+		fmt.Fprintf(errw, "pathframe: %v\n", err)
 		return 1
 	}
 	return 0
@@ -125,12 +191,14 @@ func render(w io.Writer, result workflow.Result, jsonView bool) error {
 }
 
 func usage(w io.Writer) {
-	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|pause|resume|replan|cancel]")
+	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|pause|resume|replan|cancel]")
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "No command and status both show project orientation.")
 	fmt.Fprintln(w, "Options:")
 	fmt.Fprintln(w, "  --change ID  select a change when more than one exists")
 	fmt.Fprintln(w, "  --json       render pathframe.workflow/v1 JSON")
+	fmt.Fprintln(w, "  --mode MODE  quick, standard, or high-risk (new/template)")
+	fmt.Fprintln(w, "  --artifact K artifact kind (template)")
 	fmt.Fprintln(w, "  --help       show help")
 	fmt.Fprintln(w, "  --version    show version")
 }
