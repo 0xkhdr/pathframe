@@ -75,6 +75,7 @@ const (
 	ActionExecute    Action = "execute"
 	ActionReview     Action = "review"
 	ActionComplete   Action = "complete"
+	ActionAdvance    Action = "advance"
 	ActionBlock      Action = "block"
 	ActionPause      Action = "pause"
 	ActionResume     Action = "resume"

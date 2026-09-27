@@ -1,5 +1,7 @@
 # Stage 7: Verification and Task Completion
 
+**Status:** implemented; awaiting human stop/go gate.
+
 ## Outcome and why now
 
 Submitted work completes only after Pathframe-run mechanical verification bound to repository content and separate semantic acceptance.
@@ -47,3 +49,4 @@ go test ./... && go vet ./...
 
 No implicit shell path exists; workdir cannot escape; all outcomes persist bounded facts; changed content invalidates stale success; scope violations expose recovery; mechanical success plus semantic acceptance are both necessary; completed task advances frontier. Human stop/go.
 
+Implementation evidence: `internal/verification` executes only structured argv with a required caller-supplied timeout, contained real workdir, and independent 64 KiB default stream bounds. Relevant repository identity excludes Git and replaceable Pathframe runtime records. Submitted changed-file reports are compared with task scope as an advisory signal. Append-only run events preserve verification and Brain review facts; accepted tasks feed the deterministic frontier, while rejection preserves retry/replan and the original execution policy. CLI and MCP project the same three application operations. Both Codex and Claude Code journeys reach `done` only after verification and semantic acceptance. Stage 8 recovery expansion was not started.

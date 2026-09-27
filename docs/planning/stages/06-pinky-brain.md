@@ -1,6 +1,6 @@
 # Stage 6: Pinky and Brain Vertical Slice
 
-**Status:** implemented; awaiting human stop/go gate.
+**Status:** approved.
 
 ## Outcome and why now
 

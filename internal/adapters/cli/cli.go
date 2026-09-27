@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -56,6 +57,12 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	resultFile := commandFlags.String("result-file", "", "pathframe.task-result/v1 JSON file")
 	leaseID := commandFlags.String("lease-id", "", "exact active lease identifier")
 	budgetBytes := commandFlags.Int("budget-bytes", 0, "context byte budget")
+	timeoutMS := commandFlags.Int64("timeout-ms", 0, "required verification timeout in milliseconds")
+	maxBytes := commandFlags.Int("max-bytes", 0, "per-stream verification output limit")
+	workdir := commandFlags.String("workdir", ".", "project-relative verification working directory")
+	changedFiles := commandFlags.String("changed-files", "", "comma-separated changed files for direct Brain verification")
+	reason := commandFlags.String("reason", "", "semantic review reason")
+	keepScope := commandFlags.Bool("keep-scope-violations", false, "explicitly accept advisory scope violations")
 	sessionOrientation := commandFlags.Bool("session-orientation", false, "install optional host session-start orientation")
 	if err := commandFlags.Parse(remaining); err != nil || commandFlags.NArg() != 0 {
 		return 2
@@ -179,6 +186,26 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		result, err := service.SubmitResult(input)
 		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
 	}
+	if command == "verify" {
+		files := []string{}
+		if *changedFiles != "" {
+			for _, name := range strings.Split(*changedFiles, ",") {
+				if name = strings.TrimSpace(name); name != "" {
+					files = append(files, name)
+				}
+			}
+		}
+		result, err := service.RunVerification(context.Background(), app.RunVerificationInput{Change: *commandChange, Task: *commandTask, ChangedFiles: files, Workdir: *workdir, TimeoutMS: *timeoutMS, MaxBytes: *maxBytes})
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
+	if command == "accept-task" {
+		result, err := service.AcceptTask(app.AcceptTaskInput{Change: *commandChange, Task: *commandTask, Reason: *reason, KeepScopeViolations: *keepScope})
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
+	if command == "request-changes" {
+		result, err := service.RequestChanges(app.RequestChangesInput{Change: *commandChange, Task: *commandTask, Reason: *reason})
+		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
+	}
 	if command == "lease-release" {
 		result, err := service.ReleaseLease(app.ReleaseLeaseInput{Change: *commandChange, LeaseID: *leaseID})
 		return renderArtifactResult(stdout, stderr, result, *commandJSON, true, err)
@@ -255,6 +282,10 @@ func renderArtifactResult(w, errw io.Writer, value any, jsonView, allowInvalid b
 			fmt.Fprintf(w, "Result %s for %s/%s reconciled to %s; phase: %s\n", result.LeaseID, result.Change, result.Task, result.Reconciliation.TaskState, result.Phase)
 		case app.ReleaseLeaseOutput:
 			fmt.Fprintf(w, "Lease %s released for %s/%s; phase: %s\n", result.LeaseID, result.Change, result.Task, result.Phase)
+		case app.RunVerificationOutput:
+			fmt.Fprintf(w, "Verification for %s/%s passed: %t; identity: %s\n", result.Change, result.Task, result.Verification.Passed, result.Verification.ContentIdentity)
+		case app.ReviewOutput:
+			fmt.Fprintf(w, "Task %s/%s %s; phase: %s; progress: %d/%d\n", result.Change, result.Task, result.Decision, result.Phase, result.Progress.Completed, result.Progress.Total)
 		}
 	}
 	if operationErr != nil {
@@ -373,7 +404,7 @@ func renderPacket(w io.Writer, result app.PrepareResult) {
 }
 
 func usage(w io.Writer) {
-	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|submit-result|lease-release|edit-check|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]")
+	fmt.Fprintln(w, "Usage: pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|submit-result|verify|accept-task|request-changes|lease-release|edit-check|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]")
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "No command and status both show project orientation.")
 	fmt.Fprintln(w, "Options:")
@@ -385,6 +416,12 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  --budget-bytes N explicit context byte budget (packet)")
 	fmt.Fprintln(w, "  --host HOST   preflight and lease for codex or claude-code (packet)")
 	fmt.Fprintln(w, "  --result-file PATH structured Pinky result (submit-result)")
+	fmt.Fprintln(w, "  --timeout-ms N required verification timeout (verify)")
+	fmt.Fprintln(w, "  --workdir PATH project-relative verification workdir (verify)")
+	fmt.Fprintln(w, "  --max-bytes N per-stream output bound (verify)")
+	fmt.Fprintln(w, "  --changed-files LIST comma-separated changed files for direct Brain verification")
+	fmt.Fprintln(w, "  --reason TEXT semantic review reason (accept-task/request-changes)")
+	fmt.Fprintln(w, "  --keep-scope-violations explicitly keep advisory out-of-scope files (accept-task)")
 	fmt.Fprintln(w, "  --lease-id ID exact lost lease to release (lease-release)")
 	fmt.Fprintln(w, "  --task ID     task whose Brain edit authority is checked (edit-check)")
 	fmt.Fprintln(w, "  --session-orientation install the optional SessionStart hook (host install commands)")

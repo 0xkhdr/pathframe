@@ -1,6 +1,7 @@
 package delegation
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -8,7 +9,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
+
+	"github.com/0xkhdr/pathframe/internal/verification"
 )
 
 const RunSchema = "pathframe.run/v1"
@@ -24,11 +28,26 @@ type Lease struct {
 }
 
 type RunEvent struct {
-	Schema    string    `json:"schema"`
-	LeaseID   string    `json:"lease_id"`
-	State     string    `json:"state"`
-	Timestamp time.Time `json:"timestamp"`
-	Result    *Result   `json:"result,omitempty"`
+	Schema       string        `json:"schema"`
+	LeaseID      string        `json:"lease_id"`
+	State        string        `json:"state"`
+	Timestamp    time.Time     `json:"timestamp"`
+	Result       *Result       `json:"result,omitempty"`
+	Verification *Verification `json:"verification,omitempty"`
+	Review       *Review       `json:"review,omitempty"`
+}
+
+type Verification struct {
+	Commands        []verification.Result `json:"commands"`
+	ContentIdentity string                `json:"content_identity"`
+	Passed          bool                  `json:"passed"`
+	ScopeViolations []string              `json:"scope_violations"`
+}
+
+type Review struct {
+	Decision string   `json:"decision"`
+	Reason   string   `json:"reason"`
+	Recovery []string `json:"recovery"`
 }
 
 func ActiveLease(runsDir string) (Lease, bool, error) {
@@ -100,6 +119,80 @@ func AppendRun(runsDir, id string, event RunEvent) error {
 		err = closeErr
 	}
 	return err
+}
+
+func TaskRun(runsDir, task string) (string, []RunEvent, error) {
+	paths, err := filepath.Glob(filepath.Join(runsDir, "*.jsonl"))
+	if err != nil {
+		return "", nil, err
+	}
+	sort.Strings(paths)
+	var selected []RunEvent
+	var selectedID string
+	var selectedAt time.Time
+	for _, path := range paths {
+		events, err := readRun(path)
+		if err != nil {
+			return "", nil, err
+		}
+		for _, event := range events {
+			if event.Result != nil && event.Result.Task == task && (selectedAt.IsZero() || event.Timestamp.After(selectedAt)) {
+				selectedID, selected, selectedAt = event.LeaseID, events, event.Timestamp
+			}
+		}
+	}
+	if selectedID != "" {
+		return selectedID, selected, nil
+	}
+	return "", nil, fmt.Errorf("no submitted run exists for task %s", task)
+}
+
+func CompletedTasks(runsDir string) ([]string, error) {
+	paths, err := filepath.Glob(filepath.Join(runsDir, "*.jsonl"))
+	if err != nil {
+		return nil, err
+	}
+	done := map[string]bool{}
+	for _, path := range paths {
+		events, err := readRun(path)
+		if err != nil {
+			return nil, err
+		}
+		var task string
+		for _, event := range events {
+			if event.Result != nil {
+				task = event.Result.Task
+			}
+			if task != "" && event.State == "completed" {
+				done[task] = true
+			}
+		}
+	}
+	result := make([]string, 0, len(done))
+	for task := range done {
+		result = append(result, task)
+	}
+	sort.Strings(result)
+	return result, nil
+}
+
+func readRun(path string) ([]RunEvent, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var events []RunEvent
+	for _, line := range bytes.Split(data, []byte{'\n'}) {
+		if len(bytes.TrimSpace(line)) == 0 {
+			continue
+		}
+		var event RunEvent
+		if err := json.Unmarshal(line, &event); err != nil || event.Schema != RunSchema || event.LeaseID == "" {
+			return nil, fmt.Errorf("invalid run record %s", filepath.Base(path))
+		}
+		events = append(events, event)
+	}
+	return events, nil
 }
 
 func Release(runsDir string, lease Lease) error {

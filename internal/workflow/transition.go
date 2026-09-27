@@ -16,7 +16,7 @@ var normalTransitions = map[Phase]map[Action]Phase{
 	PhasePlanning:   {ActionApprove: PhaseReady},
 	PhaseReady:      {ActionExecute: PhaseExecuting},
 	PhaseExecuting:  {ActionReview: PhaseReviewing, ActionBlock: PhaseBlocked},
-	PhaseReviewing:  {ActionComplete: PhaseDone, ActionBlock: PhaseBlocked},
+	PhaseReviewing:  {ActionComplete: PhaseDone, ActionAdvance: PhaseReady, ActionBlock: PhaseBlocked},
 	PhaseBlocked:    {ActionExecute: PhaseExecuting},
 	PhaseReplanning: {ActionPlan: PhasePlanning},
 }
@@ -28,6 +28,7 @@ var allowedActors = map[Action]map[Actor]bool{
 	ActionExecute:    {ActorBrain: true},
 	ActionReview:     {ActorBrain: true, ActorPinky: true},
 	ActionComplete:   {ActorHuman: true, ActorBrain: true},
+	ActionAdvance:    {ActorBrain: true},
 	ActionBlock:      {ActorBrain: true, ActorPinky: true, ActorSystem: true},
 	ActionPause:      {ActorHuman: true},
 	ActionResume:     {ActorHuman: true},

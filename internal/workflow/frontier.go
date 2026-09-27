@@ -8,7 +8,7 @@ func LegalActions(state State) []Action {
 		return []Action{ActionResume, ActionReplan, ActionCancel}
 	}
 	actions := make([]Action, 0, 5)
-	for _, action := range []Action{ActionPlan, ActionApprove, ActionExecute, ActionReview, ActionComplete, ActionBlock} {
+	for _, action := range []Action{ActionPlan, ActionApprove, ActionExecute, ActionReview, ActionComplete, ActionAdvance, ActionBlock} {
 		if _, ok := normalTransitions[state.Phase][action]; ok {
 			actions = append(actions, action)
 		}

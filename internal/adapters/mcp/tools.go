@@ -90,6 +90,18 @@ func addTools(server *mcp.Server, service app.Service) {
 		out, err := service.SubmitResult(in)
 		return nil, out, err
 	})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_run_verification", Description: "Run the approved structured argv verification with a required timeout, contained workdir, and bounded output."}, func(ctx context.Context, _ *mcp.CallToolRequest, in app.RunVerificationInput) (*mcp.CallToolResult, app.RunVerificationOutput, error) {
+		out, err := service.RunVerification(ctx, in)
+		return nil, out, err
+	})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_accept_task", Description: "Record Brain semantic acceptance after fresh passing Pathframe verification; complete the task and advance the deterministic frontier."}, func(ctx context.Context, _ *mcp.CallToolRequest, in app.AcceptTaskInput) (*mcp.CallToolResult, app.ReviewOutput, error) {
+		out, err := service.AcceptTask(in)
+		return nil, out, err
+	})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_request_changes", Description: "Record Brain's reason for rejecting submitted work and return the task to an executable recovery path."}, func(ctx context.Context, _ *mcp.CallToolRequest, in app.RequestChangesInput) (*mcp.CallToolResult, app.ReviewOutput, error) {
+		out, err := service.RequestChanges(in)
+		return nil, out, err
+	})
 	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_release_delegation", Description: "Explicitly release a lost active lease by exact ID, preserving delegated policy and moving the change to a recoverable blocker."}, func(ctx context.Context, _ *mcp.CallToolRequest, in app.ReleaseLeaseInput) (*mcp.CallToolResult, app.ReleaseLeaseOutput, error) {
 		out, err := service.ReleaseLease(in)
 		return nil, out, err

@@ -3,7 +3,7 @@
 Running `pathframe` with no arguments is equivalent to `pathframe status`. Both answer whether the project is configured, which change and phase are active, task progress, blockers, the recommended next action, legal alternatives, and whether a human is required.
 
 ```text
-pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|submit-result|lease-release|edit-check|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]
+pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|submit-result|verify|accept-task|request-changes|lease-release|edit-check|pause|resume|replan|cancel|codex-install|codex-doctor|claude-install|claude-doctor]
 ```
 
 - `status` and `next` render the canonical `pathframe.workflow/v1` orientation.
@@ -16,6 +16,9 @@ pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|
 - `approve --change ID` is the explicit human approval operation and binds the validated material plan identity.
 - `packet --change ID [--task ID] [--budget-bytes N]` previews the bounded packet. Add `--host codex|claude-code` to run preflight and acquire one exclusive lease before Brain launches the native Pinky. Pathframe itself never launches a host worker.
 - `submit-result --result-file PATH` validates the leased `pathframe.task-result/v1`, records it, and reconciles to reviewing or blocked. It never accepts or completes a task.
+- `verify --change ID --task ID --timeout-ms N [--workdir PATH] [--max-bytes N] [--changed-files LIST]` runs every approved argv directly, never through a shell. Workdir must resolve inside the project; timeout is required; stdout/stderr are independently bounded. A directly authorized Brain task supplies its changed files here; a delegated task reuses Pinky's submitted list. Results record exit, duration, timeout/interruption, truncation, content identity, and advisory-scope violations.
+- `accept-task --change ID --task ID --reason TEXT [--keep-scope-violations]` records Brain's semantic acceptance only after fresh passing Pathframe verification. The explicit scope flag records a keep decision; Pathframe never reverts files automatically.
+- `request-changes --change ID --task ID --reason TEXT` records Brain's rejection and leaves retry/replan recovery available under the unchanged execution policy.
 - `lease-release --change ID --lease-id ID` explicitly releases a lost worker lease and preserves a recoverable blocker.
 - `edit-check --change ID --task ID` enforces Brain edit authority. Delegated policy is denied regardless of delegation failure.
 - `codex-install [--session-orientation]` installs manifest-owned Codex skill and stdio MCP assets; the optional flag adds supported session-start orientation.
@@ -25,4 +28,4 @@ pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|
 
 Flags may follow the command. Illegal transitions exit nonzero after returning current state, a stable reason code, and executable recovery actions. An incomplete final journal record is diagnosed and safely discarded without inventing state; a missing, corrupt, or divergent projection is rebuilt from complete journal records.
 
-See [Planning artifacts](ARTIFACTS.md), [Codex integration](CODEX.md), and [Claude Code integration](CLAUDE-CODE.md). `pathframe mcp` is the generated local stdio entry point, not a generic command executor. Stage 6 provides sequential host-native delegation and result reconciliation only; verification execution and completion remain absent.
+See [Planning artifacts](ARTIFACTS.md), [Codex integration](CODEX.md), and [Claude Code integration](CLAUDE-CODE.md). `pathframe mcp` is the generated local stdio entry point, not a generic command executor. Worker-reported checks remain supplemental; task completion requires both Pathframe verification and Brain semantic acceptance.

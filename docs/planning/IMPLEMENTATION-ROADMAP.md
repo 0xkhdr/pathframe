@@ -2,7 +2,7 @@
 
 ## Current state
 
-Stages 0 through 5 are approved. Stage 6 is implemented and awaiting its human gate: declared host capabilities, preflight, exclusive leases, Codex/Claude sequential Pinky guidance, structured result submission/reconciliation, edit guard, and no-fallback enforcement are present. Verification acceptance and task completion remain unimplemented.
+Stages 0 through 6 are approved. Stage 7 is implemented and awaiting its human gate: structured bounded argv execution, contained workdirs, timeouts/interruption, content identity, advisory scope comparison, separate semantic review, changes-requested recovery, and deterministic frontier/change completion are present.
 
 ## Architecture
 
@@ -18,8 +18,8 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 | [3](stages/03-codex.md) | Codex-native planning | 2 | approved |
 | [4](stages/04-claude-code.md) | Claude Code parity | 3 | approved |
 | [5](stages/05-context-and-roles.md) | Roles, context, task packets | 4 | approved |
-| [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | implemented; awaiting human gate |
-| [7](stages/07-verification-completion.md) | Verification and completion | 6 | planned |
+| [6](stages/06-pinky-brain.md) | Sequential delegation | 5 | approved |
+| [7](stages/07-verification-completion.md) | Verification and completion | 6 | implemented; awaiting human gate |
 | [8](stages/08-doctor-recovery.md) | Complete Doctor/recovery | 7 | planned |
 | [9](stages/09-hardening.md) | Adoption hardening and platform proof | 8 | planned |
 
@@ -45,15 +45,15 @@ Each stage requires implementation complete, focused tests, full affected suite,
 
 ## Next implementation task after the gate
 
-Do not begin Stage 7 until a human approves the Stage 6 gate. After approval, the next task is S7-T1 in [Stage 7](stages/07-verification-completion.md).
+Do not begin Stage 8 until a human approves the Stage 7 gate. After approval, the next task is S8-T1 in [Stage 8](stages/08-doctor-recovery.md).
 
-Stage 6 remains at its stop/go gate until then. Verify it with:
+Stage 7 remains at its stop/go gate until then. Verify it with:
 
 ```sh
-go test ./internal/delegation ./internal/integrations/codex ./internal/integrations/claude ./internal/app
-go test ./tests/journey -run Delegation
+go test ./internal/verification ./internal/app
+go test ./tests/journey -run 'Verification|Completion|ChangesRequested'
 go test ./...
 go vet ./...
 ```
 
-Acceptance: both hosts complete one sequential delegation; preflight failures do not mutate workflow state; conflicting leases block; Brain cannot inherit delegated authority; Pinky only submits; lost leases have explicit recovery; no Stage 7 completion behavior exists.
+Acceptance: no implicit shell path exists; workdirs cannot escape; results remain bounded and durable; stale content blocks acceptance; scope violations expose keep/revert/replan; mechanical success and semantic acceptance are separate; completion advances the frontier on both hosts.

@@ -57,7 +57,11 @@ func (s Service) PrepareDelegation(input PrepareInput) (PrepareResult, error) {
 		result.Recovery = []string{"repair the named artifacts, revalidate, and request human reapproval"}
 		return result, nil
 	}
-	result.Projection = delegation.Project(plan.Tasks, nil)
+	completed, err := delegation.CompletedTasks(filepath.Join(dir, "runs"))
+	if err != nil {
+		return PrepareResult{}, err
+	}
+	result.Projection = delegation.Project(plan.Tasks, completed)
 	if len(result.Projection.Diagnostics) > 0 {
 		result.Issues = append(result.Issues, result.Projection.Diagnostics...)
 		result.Recovery = append(result.Recovery, result.Projection.Recovery...)
@@ -138,6 +142,7 @@ func (s Service) PrepareDelegation(input PrepareInput) (PrepareResult, error) {
 		result.Recovery = []string{"split the task or explicitly raise budget_bytes and preview again"}
 		return result, nil
 	}
+	packet.CompletedPrerequisites = append([]string(nil), completed...)
 	result.Packet = &packet
 	if input.Host == "" {
 		return result, nil

@@ -13,7 +13,7 @@ func Reconcile(status Status) Reconciliation {
 	switch status {
 	case ResultCompleted:
 		result.TaskState = "submitted"
-		result.Recovery = []string{"review the submission; Stage 7 will add verification and acceptance"}
+		result.Recovery = []string{"run Pathframe verification, then semantically accept or request changes"}
 	case ResultNeedsReplan:
 		result.TaskState, result.RequiresReplan = "blocked", true
 		result.Recovery = []string{"replan the task and obtain human reapproval"}

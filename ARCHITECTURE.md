@@ -80,6 +80,10 @@ The `context` domain owns strict role parsing, contained foundation/change refer
 
 The `delegation` domain validates declared host capabilities, enforces delegated policy, owns one exclusive active lease, bounds append-only run records, validates `pathframe.task-result/v1`, and produces reconciliation without acceptance. Host integrations declare only native sequential/shared-workspace/result-return facts and provide Pinky instructions; Brain performs the native launch. `app.PrepareDelegation`, `SubmitResult`, `ReleaseLease`, and `CheckBrainEdit` are canonical operations shared by CLI/MCP. Scope remains advisory unless the host manifest explicitly declares enforcement. Failed launch, worker failure, and released leases never change `execution_policy` or authorize Brain fallback.
 
+## Stage 7 verification and completion
+
+The `verification` domain validates project-contained working directories, executes approved argv directly with required timeouts, independently bounds stdout/stderr, computes relevant repository content identity, and compares reported changed files with advisory scope. Append-only run events retain submissions, every verification outcome, and Brain review decisions. `app.RunVerification`, `AcceptTask`, and `RequestChanges` are shared by CLI and MCP. Passing mechanical verification never implies semantic acceptance; acceptance rejects stale content and advances the completed-task frontier or completes the change. No shell, destructive revert, parallel worker, or expanded Doctor behavior was added.
+
 ## Legacy reuse rule
 
 Pathframe is a fresh project, not Specd renamed. Do not copy legacy code until a scoped task traces its actual behavior and tests, confirms license and architectural fit, and records why reuse is smaller and safer than a fresh implementation.
