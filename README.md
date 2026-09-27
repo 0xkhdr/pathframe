@@ -8,13 +8,13 @@ Pathframe will give humans and coding agents one local view of current work: whe
 
 ## Project status
 
-Pathframe is in Stage 0. The repository currently contains product and implementation plans only. No production CLI or workflow behavior exists yet.
+Pathframe is in Stage 0. The repository contains its product plans and a minimal CLI foundation; workflow behavior is not implemented yet.
 
 The first supported production platform will be Linux amd64 with Go 1.26. Linux arm64, macOS amd64/arm64, and Windows amd64 remain portability targets until Stage 9 proves them through CI and end-to-end journeys.
 
 ## Intended first use
 
-After the foundation and Navigator stages, running `pathframe` without arguments will orient the user instead of printing bare usage. Later stages will add progressively rigorous planning artifacts, typed Codex and Claude Code integrations, bounded sequential delegation, verification, and recovery.
+Running `pathframe` without arguments provides an honest Stage 0 orientation instead of bare usage. The Navigator stage will replace that placeholder with project and change state. Later stages will add progressively rigorous planning artifacts, typed Codex and Claude Code integrations, bounded sequential delegation, verification, and recovery.
 
 ## Boundaries
 

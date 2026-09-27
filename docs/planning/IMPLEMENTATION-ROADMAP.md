@@ -2,7 +2,7 @@
 
 ## Current state
 
-Repository contains only an empty README and two authoritative planning documents. No production source, tests, module, CI, integration, or managed state exists. Go 1.26.4 Linux amd64 is available. Git history confirms the accepted decisions; no contradiction or new blocking decision was found.
+The Stage 0 foundation is implemented: constitution documents, a Go 1.26 module, minimal Linux amd64 CLI, smoke tests, and CI. Workflow state, integrations, and managed data remain unimplemented. Go 1.26.4 Linux amd64 is available. Git history confirms the accepted decisions; no contradiction or new blocking decision was found.
 
 ## Architecture
 
@@ -12,7 +12,7 @@ One canonical application layer coordinates deterministic workflow, artifacts, c
 
 | Stage | Capability | Depends | Status |
 | --- | --- | --- | --- |
-| [0](stages/00-foundation.md) | Foundation and constitution | none | planned |
+| [0](stages/00-foundation.md) | Foundation and constitution | none | implemented; awaiting human gate |
 | [1](stages/01-navigator.md) | Navigator/orientation/recovery kernel | 0 | planned |
 | [2](stages/02-templates-okf.md) | OKF artifacts and approval | 1 | planned |
 | [3](stages/03-codex.md) | Codex-native planning | 2 | planned |
@@ -43,11 +43,11 @@ Go 1.26/Linux amd64 first; standard-library `flag`; official MCP SDK via stdio; 
 
 Each stage requires implementation complete, focused tests, full affected suite, demonstrated journey, aligned docs, recorded risks, and human stop/go. No later stage starts with unresolved acceptance failures. Every non-terminal state needs an executable recovery. No recovery depends on deletion or Git rewriting.
 
-## Exact first implementation task
+## Next implementation task after the gate
 
-`S0-T1 — Create Pathframe product constitution documents.`
+No Stage 1 implementation may begin until a human approves the Stage 0 gate. After approval, the next task is the first ordered task in [Stage 1](stages/01-navigator.md).
 
-Starting from the two root authority files, replace the empty `README.md` and create `PHILOSOPHY.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `AGENTS.md`, and `docs/decisions/README.md`. Preserve the exact product statement and foundational philosophy. Record all ten accepted decisions, initial non-goals, layer/dependency rules, Stage 0 Linux amd64 support claim, deviation-record process, and prohibition on copying legacy subsystems without a traced reason. Do not add Go code or production behavior. Verify with:
+Stage 0 remains at its stop/go gate until then. Verify it with:
 
 ```sh
 rg -n "Pathframe is a local, deterministic|The agent reasons" README.md PHILOSOPHY.md ARCHITECTURE.md
@@ -55,5 +55,4 @@ rg -n "Go 1.26|Linux amd64|flag|stdio|approval|execution_policy|okf-markdown/v1|
 git diff --check
 ```
 
-Acceptance: a cold contributor can state purpose, boundaries, supported platform, non-goals, and deviation process from these documents alone; no production file exists.
-
+Acceptance: a cold contributor can state purpose, boundaries, supported platform, non-goals, and deviation process from these documents alone; the minimal CLI passes the Stage 0 checks without implementing workflow behavior.
