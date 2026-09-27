@@ -108,6 +108,25 @@ Pathframe may declare scope and validate results, but it must not claim filesyst
 
 Do not restore a Specd mechanism merely because it already exists. Reuse it only when it directly supports the simplified Pathframe workflow.
 
+## Accepted implementation decisions
+
+These decisions are approved constraints for repository planning and implementation:
+
+| Concern | Decision |
+| --- | --- |
+| Language and platform | Use Go 1.26. Initially support Linux amd64. Treat Linux arm64, macOS amd64/arm64, and Windows amd64 as portability targets until Stage 9 proves them with CI and end-to-end journeys. |
+| CLI | Use Go's standard `flag` package with a small subcommand dispatcher. Add no CLI framework. The no-argument command renders orientation rather than bare usage. |
+| MCP | Use local stdio and the official MCP Go SDK, pinned when Stage 3 begins. Confine the SDK to the MCP adapter. Defer Streamable HTTP and do not hand-roll JSON-RPC. |
+| Approval | Require explicit human approval for `planning -> ready` in every mode. Quick mode may validate and obtain approval in one interaction. Material plan changes require revalidation and reapproval; routine transitions do not. |
+| Task execution | Quick tasks default to explicit `execution_policy: brain`. Other tasks also declare their policy. A delegated task never falls back to Brain, and changing approved execution policy requires reapproval. |
+| OKF and Aido | Pathframe owns a minimal `okf-markdown/v1` profile plus versioned Pathframe schemas. Aido is optional and read-only. There is no shared lifecycle, required service, shared package, automatic synchronization, or cross-writing. |
+| Host capability baseline | Require only one sequential host-native subagent, a supplied task packet, shared-workspace access, and a returned final result. Scope is advisory unless enforcement is declared. Do not assume sandboxing, worktrees, cancellation, resumption, hooks, or parallelism. |
+| Verification | Pathframe executes approved verification with structured argument arrays, a contained working directory, and a timeout. Initial execution does not invoke an implicit shell. Worker reports are supplemental; mechanical verification and semantic acceptance are both required. |
+| Reconstruction | Authored artifacts define intended work; an append-only transition journal and bounded run records preserve lifecycle facts; `state.json` is a replaceable projection. Git and conversations are not reconstruction authorities. |
+| Specd | Provide no import, compatibility reader, or automatic `.specd/` detection initially. Reconsider only a one-time importer at Stage 9 if real demand and fixtures justify it. |
+
+A later implementation may refine internal names or representations without reopening these product choices. Reversing one requires a newer explicit human decision and a recorded rationale.
+
 ## Non-goals for the initial product
 
 - Becoming an LLM or agent runtime
@@ -271,6 +290,7 @@ Human text is a projection of this result, not a separate decision engine.
       tasks/
         T1.md
         T2.md
+      history.jsonl
       state.json
       runs/
 ```
@@ -284,7 +304,9 @@ The implementation plan may refine this layout, but it must preserve clear owner
 
 ### OKF-compatible templates
 
-Generated Markdown follows a versioned profile such as `okf-markdown/v1`. OKF support should be implemented behind a template/profile boundary so Pathframe does not couple its core lifecycle to one evolving document schema.
+Generated Markdown follows the Pathframe-owned `okf-markdown/v1` profile. Each artifact also declares its versioned Pathframe schema. The profile boundary keeps the core lifecycle independent from document rendering and from Aido.
+
+Aido may be consumed as an optional, read-only source of approved knowledge or business intent. An explicit import or reference never starts implementation. Pathframe never writes `.aido/`; Aido never writes `.pathframe/`. A Pathframe intent seeded from Aido becomes an independent Pathframe artifact with its own validation, approval, and lifecycle. Pathframe remains fully usable when Aido is absent or removed.
 
 Templates contain:
 
@@ -394,6 +416,8 @@ Before delegation, Pathframe validates:
 
 Failure creates a configuration blocker. Brain does not inherit permission to code.
 
+The required host baseline is deliberately small: launch one host-native subagent with a task packet in the shared repository workspace, wait for its final response, and return that response for submission. The integration declares stronger capabilities explicitly. Unknown capabilities are unsupported. Declared write scope is advisory unless the host reports enforcement, and Pathframe never describes an advisory scope as containment.
+
 ### Task packet
 
 The canonical `pathframe.task/v1` packet contains:
@@ -419,6 +443,8 @@ The canonical `pathframe.task-result/v1` result supports:
 - `needs_replan`.
 
 It reports summary, changed files, verification, discoveries, questions, and risks. Pinky never marks itself accepted; Brain or a reviewer reconciles the result.
+
+Pinky's verification report is diagnostic. After submission, Pathframe runs the approved structured verification commands and records their bounded output, exit status, duration, timeout or interruption, and repository content identity. Commands use argument arrays, a project-contained working directory, and a required timeout; implicit shell execution is not supported initially. A task completes only after this mechanical verification and semantic acceptance.
 
 ## Codex and Claude Code integration
 
@@ -472,7 +498,7 @@ The default workflow observes Git but does not make Git the lifecycle engine.
 
 ### Reconstructable state
 
-Authored artifacts are durable input. `state.json` is a machine projection and should be reconstructable from artifact metadata and bounded run records.
+Authored artifacts are durable intent. A minimal append-only transition journal records approvals and lifecycle changes, while bounded run records capture leases, submissions, verification, and reconciliation. `state.json` is a replaceable machine projection reconstructed from these sources. Run metadata is retained initially, with fixed limits on potentially large output; compaction waits for measured need. Git and conversation history are not reconstruction sources.
 
 ### Doctor responsibilities
 
@@ -565,7 +591,8 @@ Create a clean Pathframe repository whose documentation prevents implementation 
 
 #### Deliverables
 
-- Go module and minimal CLI entry point
+- Go 1.26 module and minimal CLI entry point for Linux amd64
+- standard-library `flag` parsing with a small subcommand dispatcher
 - `README.md` with product statement and first-use vision
 - `PHILOSOPHY.md` with principles and non-goals
 - `ARCHITECTURE.md` with initial boundaries
@@ -622,12 +649,12 @@ Generate self-describing, progressively rigorous planning artifacts.
 #### Deliverables
 
 - Template/profile interface
-- Versioned `okf-markdown/v1` profile
+- Pathframe-owned `okf-markdown/v1` profile and versioned Pathframe artifact schemas
 - Quick, Standard, and High-risk modes
 - `new`, template instruction, and `check` operations
 - Task-per-file parser
 - Stable reference validation
-- Plan approval transition
+- Explicit human plan-approval transition for every mode, with material-change invalidation
 - Clear ownership of authored versus machine files
 
 #### Validation
@@ -652,7 +679,7 @@ Make Pathframe native to Codex rather than a CLI the model must memorize.
 
 - Generated Codex skill
 - Activation and non-activation rules
-- Typed MCP operations for orientation, change creation, templates, validation, approval handoff, and next action
+- Typed MCP operations over local stdio using the official MCP Go SDK for orientation, change creation, templates, validation, approval handoff, and next action
 - Integration version manifest
 - Optional supported session-start orientation
 - Negative activation evaluation set
@@ -730,7 +757,7 @@ Safely delegate and reconcile one sequential task.
 
 #### Deliverables
 
-- Host capability declaration
+- Host capability declaration using the minimal sequential shared-workspace baseline
 - Delegation preflight
 - Task lease
 - Codex subagent adapter
@@ -738,7 +765,7 @@ Safely delegate and reconcile one sequential task.
 - Pinky worker instructions
 - `pathframe.task-result/v1`
 - Result submission and Brain reconciliation
-- Brain edit guard for delegated tasks
+- Brain edit guard for delegated tasks and explicit `execution_policy` enforcement
 - Explicit no-fallback blocker
 
 #### Validation
@@ -761,7 +788,7 @@ Make completion meaningful without recreating the heavy evidence system.
 
 #### Deliverables
 
-- Declared verification execution or host-submitted result contract
+- Pathframe-run structured verification with argument arrays, contained working directories, timeouts, and bounded results
 - Changed-file comparison against advisory scope
 - Brain/reviewer acceptance transition
 - Changes-requested loop
@@ -789,7 +816,7 @@ Eliminate delete-and-restart recovery.
 
 - `doctor` diagnosis catalog
 - Safe repair operations
-- Machine-state reconstruction
+- Machine-state reconstruction from authored artifacts, the transition journal, and bounded run records
 - Abandoned lease recovery
 - Replan impact analysis
 - Preservation of unaffected completed tasks
@@ -816,7 +843,7 @@ Prepare the sequential product for real adoption.
 
 - Cross-platform CI for claimed platforms
 - Installation and update path
-- Migration/import decision for Specd artifacts
+- Explicit confirmation that the initial release has no Specd compatibility; evaluate a one-time importer only if real demand and representative fixtures exist
 - Performance budgets for repository discovery, plan validation, and packet assembly
 - Security review of path handling and command execution
 - Stable docs and onboarding journey
@@ -873,19 +900,9 @@ Every stage ends with:
 6. unresolved risks recorded;
 7. human stop/go decision.
 
-## Decisions required during implementation planning
+## Decision status
 
-The coding agent must surface these instead of silently choosing:
-
-1. Exact OKF version and ownership boundary with Aido
-2. Go version and CLI/MCP transport choices
-3. Default approval semantics
-4. Direct Brain execution policy for Quick mode
-5. Codex and Claude Code subagent capabilities to treat as baseline
-6. Whether task verification is run by Pathframe or reported by the host
-7. State reconstruction source and minimum retained run records
-8. Compatibility/import approach for existing Specd artifacts
-9. Primary supported platforms for the first release
+The implementation decisions formerly required during planning are resolved in **Accepted implementation decisions**. The coding agent must carry them into repository-specific contracts and stages rather than reopening them. Any new decision that materially changes architecture or scope must state its options, recommended default, deferral consequence, and first blocked stage.
 
 ## Success metrics
 
@@ -918,4 +935,3 @@ Pathframe reaches initial full development when Stages 0 through 9 pass their ga
 12. The final outcome is reviewed and the change becomes done.
 
 Parallel Pinkies, strict Git evidence, and organization-scale controls remain separate future decisions.
-

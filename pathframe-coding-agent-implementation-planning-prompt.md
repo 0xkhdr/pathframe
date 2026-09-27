@@ -52,6 +52,23 @@ Your implementation plan must preserve these boundaries:
 11. Codex is supported first, Claude Code second, and broader integrations are deferred.
 12. Sequential delegated execution is completed before parallel Pinkies are considered.
 
+### Accepted implementation decisions
+
+Treat the following as approved product constraints, not open questions:
+
+1. Use Go 1.26. The initial supported production platform is Linux amd64. Linux arm64, macOS amd64/arm64, and Windows amd64 are portability targets that become supported only after Stage 9 CI and journey validation.
+2. Implement the CLI with Go's standard `flag` package and a small subcommand dispatcher. Do not add a CLI framework. Running `pathframe` with no arguments remains the orientation view.
+3. Implement MCP as local stdio through the official MCP Go SDK, pinned when Stage 3 begins. Keep the SDK inside the MCP adapter. Do not implement Streamable HTTP or custom JSON-RPC initially.
+4. Require explicit human approval before `planning -> ready` in every mode. Quick approval may occur in the same interaction. Material changes to an approved plan require validation and approval again; routine transitions do not.
+5. Quick tasks default to an explicit `execution_policy: brain`. Any task may explicitly select `delegated`. Delegation failure never changes the policy or transfers authority to Brain. Changing policy after approval requires reapproval.
+6. Pathframe owns a minimal `okf-markdown/v1` profile, specialized by versioned Pathframe artifact schemas. Aido is an optional read-only knowledge source. Neither product writes the other's directory, requires the other, shares lifecycle state, or synchronizes automatically.
+7. The minimum delegated-host capability is one sequential host-native subagent launched with a task packet in the shared repository workspace, with a final result returned for submission. Filesystem scope is advisory unless the host explicitly declares enforcement. Do not assume worktrees, sandboxes, cancellation, resumable workers, hooks, or parallel workers.
+8. Pathframe runs approved verification commands itself using structured argument arrays, a project-contained working directory, and a required timeout. No implicit shell execution initially. Worker-reported verification is supplemental; completion requires Pathframe verification and semantic acceptance.
+9. Authored artifacts define intended work. A minimal append-only transition journal and bounded run records hold durable lifecycle facts. `state.json` is a replaceable projection rebuilt by Doctor. Git and conversation history are not reconstruction authorities.
+10. The initial release has no Specd import, compatibility reader, or automatic `.specd/` detection. A one-time, read-only-source importer may be reconsidered at Stage 9 only if real demand and representative fixtures justify it.
+
+Plans may refine file names and internal representation where repository analysis requires it, but must not reverse these decisions without a newer explicit human decision.
+
 ### Explicit non-goals
 
 Do not introduce the following into the initial implementation plan unless the analysis identifies an unavoidable requirement and explains it to the user:
@@ -193,18 +210,9 @@ Deleting `.pathframe/` is not an acceptable recovery plan.
 
 ### Decision discipline
 
-Do not silently decide the following if they are unresolved:
+Record the accepted implementation decisions above in the architecture plan, contracts, stages, and decision register. Do not present them for approval again. If repository evidence exposes a direct contradiction, document it and stop before planning work that depends on reversing an accepted decision.
 
-- exact OKF contract and Aido boundary;
-- default plan-approval semantics;
-- direct Brain execution policy for Quick mode;
-- baseline Codex and Claude subagent capabilities;
-- whether Pathframe runs verification or consumes host results;
-- state reconstruction source;
-- Specd import/migration policy;
-- initially supported platforms.
-
-For each unresolved decision:
+For each genuinely new unresolved decision:
 
 1. state why it matters;
 2. present two or three viable options;
@@ -267,12 +275,12 @@ Before presenting the plan:
 
 - Analyze before designing.
 - State assumptions explicitly.
-- Ask the user only about decisions that materially change architecture or scope.
+- Ask the user only about new decisions that materially change architecture or scope. Do not reopen accepted implementation decisions without contradictory evidence.
 - Prefer the simplest design that preserves the product promises.
 - Do not copy legacy Specd code until you have traced its behavior, tests, and fit.
 - Do not add dependencies without explaining the concrete need and operational cost.
 - Do not start implementation after writing the plan.
-- Finish by presenting the roadmap, key decisions requiring approval, the first stage gate, and the exact first implementation task.
+- Finish by presenting the roadmap, any new decisions requiring approval, the first stage gate, and the exact first implementation task.
 
 The result should allow another coding agent to implement Pathframe stage by stage, validate each stage independently, stop safely at any gate, and resume without relying on conversation history.
 
@@ -285,9 +293,8 @@ The coding agent should return a concise handoff containing:
 - the repository condition it found;
 - the proposed architecture in one paragraph;
 - the staged roadmap;
-- decisions requiring human approval;
+- any new decisions requiring human approval, without reopening accepted decisions;
 - critical risks;
 - links to the generated planning files;
 - the exact first implementation task;
 - confirmation that no production implementation was performed.
-
