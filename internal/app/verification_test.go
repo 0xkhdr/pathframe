@@ -122,6 +122,7 @@ func submittedService(t *testing.T, changed []string, second bool) (Service, str
 	root := t.TempDir()
 	dir := filepath.Join(root, ".pathframe", "changes", "demo")
 	copyFixture(t, filepath.Join("..", "..", "testdata", "artifacts", "standard"), dir)
+	writeBackendRole(t, root)
 	taskPath := filepath.Join(dir, "tasks", "T1.md")
 	data, err := os.ReadFile(taskPath)
 	if err != nil {

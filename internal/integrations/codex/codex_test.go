@@ -29,6 +29,15 @@ func TestInstallDoctorAndNonDestructiveUpdate(t *testing.T) {
 			t.Fatalf("skill missing %q", rule)
 		}
 	}
+	config, err := os.ReadFile(filepath.Join(root, ".codex", "config.toml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tool := range []string{"pathframe_run_verification", "pathframe_accept_task", "pathframe_request_changes", "pathframe_doctor"} {
+		if !strings.Contains(string(config), `"`+tool+`"`) {
+			t.Fatalf("config missing enabled tool %q", tool)
+		}
+	}
 	if err := os.WriteFile(skillPath, append(skill, []byte("custom\n")...), 0o644); err != nil {
 		t.Fatal(err)
 	}

@@ -81,7 +81,7 @@ func TestPrepareDelegationRequiredBudgetBlocks(t *testing.T) {
 	}
 }
 
-func TestPrepareDelegationMissingRoleBlocksBeforeMutation(t *testing.T) {
+func TestCheckMissingRoleBlocksBeforeApproval(t *testing.T) {
 	root := t.TempDir()
 	dir := filepath.Join(root, ".pathframe", "changes", "demo")
 	copyFixture(t, filepath.Join("..", "..", "testdata", "artifacts", "standard"), dir)
@@ -89,15 +89,12 @@ func TestPrepareDelegationMissingRoleBlocksBeforeMutation(t *testing.T) {
 	if _, err := service.CreateChange("demo", artifacts.Standard); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.Approve("demo"); err != nil {
-		t.Fatal(err)
-	}
-	got, err := service.PrepareDelegation(PrepareInput{Change: "demo", Host: "codex"})
-	if err != nil || got.Lease != nil || len(got.Issues) == 0 || !strings.Contains(got.Issues[0], "role") {
-		t.Fatalf("prepare = %#v, %v", got, err)
+	got, err := service.Check("demo")
+	if err != nil || got.Valid || len(got.Issues) == 0 || got.Issues[len(got.Issues)-1].Code != "unknown_role" {
+		t.Fatalf("check = %#v, %v", got, err)
 	}
 	view, err := service.Orient("demo")
-	if err != nil || view.Phase != "ready" {
-		t.Fatalf("preflight mutated state: %#v, %v", view, err)
+	if err != nil || view.Phase != "planning" {
+		t.Fatalf("check mutated state: %#v, %v", view, err)
 	}
 }

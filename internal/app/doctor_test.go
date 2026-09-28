@@ -16,6 +16,7 @@ func TestDoctorRepairsAbandonedLeaseWithoutPolicyFallback(t *testing.T) {
 	root := t.TempDir()
 	dir := filepath.Join(root, ".pathframe", "changes", "demo")
 	copyFixture(t, filepath.Join("..", "..", "testdata", "artifacts", "standard"), dir)
+	writeBackendRole(t, root)
 	service := Service{Dir: root}
 	if _, err := service.CreateChange("demo", artifacts.Standard); err != nil {
 		t.Fatal(err)

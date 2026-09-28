@@ -14,7 +14,7 @@ func TestOperationsPersistAndRejectWithRecovery(t *testing.T) {
 	root := project(t, "demo")
 	service := Service{Dir: filepath.Join(root, ".pathframe", "changes", "demo")}
 	paused, err := service.Pause("")
-	if err != nil || paused.Phase != workflow.PhasePaused {
+	if err != nil || paused.Phase != workflow.PhasePaused || len(paused.Diagnostics) != 0 {
 		t.Fatalf("Pause() = %#v, %v", paused, err)
 	}
 	resumed, err := service.Resume("")
@@ -42,6 +42,17 @@ func TestOrientRequiresSelectionForMultipleChanges(t *testing.T) {
 	selected, err := service.Orient("two")
 	if err != nil || selected.Change != "two" {
 		t.Fatalf("Orient(two) = %#v, %v", selected, err)
+	}
+}
+
+func TestOrientMissingSelectedChangeReturnsStructuredRecovery(t *testing.T) {
+	root := t.TempDir()
+	if err := os.Mkdir(filepath.Join(root, ".pathframe"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	result, err := (Service{Dir: root}).Orient("demo")
+	if err != nil || len(result.Blockers) != 1 || result.Blockers[0].Code != workflow.ReasonNoChange || result.Recommended.Action != workflow.ActionNew {
+		t.Fatalf("Orient(missing) = %#v, %v", result, err)
 	}
 }
 

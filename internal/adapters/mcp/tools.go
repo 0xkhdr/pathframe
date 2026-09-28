@@ -117,6 +117,10 @@ func addTools(server *mcp.Server, service app.Service) {
 		out, err := service.CheckBrainEdit(in)
 		return nil, out, err
 	})
+	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_doctor", Description: "Diagnose and optionally repair only listed safe machine-state problems."}, func(ctx context.Context, _ *mcp.CallToolRequest, in app.DoctorInput) (*mcp.CallToolResult, recovery.Report, error) {
+		out, err := service.Doctor(in)
+		return nil, out, err
+	})
 	mcp.AddTool(server, &mcp.Tool{Name: "pathframe_recover", Description: "Diagnose and optionally repair replaceable machine state, or apply pause, resume, replan, or cancel."}, func(ctx context.Context, _ *mcp.CallToolRequest, in recoverInput) (*mcp.CallToolResult, recoverOutput, error) {
 		if in.Action == "" {
 			out, err := service.Doctor(app.DoctorInput{Change: in.Change, Repair: in.Repair})

@@ -48,6 +48,13 @@ func (s Service) Orient(change string) (workflow.Result, error) {
 			return workflow.Result{Schema: workflow.Schema, ProjectRoot: root, Configured: true, Alternatives: []workflow.ActionResult{}, Diagnostics: []workflow.ReasonCode{}, Blockers: []workflow.Blocker{{Code: workflow.ReasonAmbiguousChange, Message: "multiple changes found; select one with --change", Recovery: []workflow.ActionResult{{Action: workflow.ActionSelect}}}}, HumanRequired: true}, nil
 		}
 	}
+	found := false
+	for _, candidate := range changes {
+		found = found || candidate == change
+	}
+	if !found {
+		return workflow.Result{Schema: workflow.Schema, ProjectRoot: root, Configured: true, Alternatives: []workflow.ActionResult{}, Diagnostics: []workflow.ReasonCode{}, Blockers: []workflow.Blocker{{Code: workflow.ReasonNoChange, Message: "selected change does not exist", Recovery: []workflow.ActionResult{{Action: workflow.ActionNew}}}}, Recommended: workflow.ActionResult{Action: workflow.ActionNew}, HumanRequired: true}, nil
+	}
 	dir, err := store.ChangeDir(root, change)
 	if err != nil {
 		return workflow.Result{}, err

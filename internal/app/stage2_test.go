@@ -87,6 +87,28 @@ func TestModeIncreaseAddsOnlyMissingArtifactsAndLoweringFails(t *testing.T) {
 	}
 }
 
+func TestCheckRejectsRoleMismatchBeforeApproval(t *testing.T) {
+	root := t.TempDir()
+	dir := filepath.Join(root, ".pathframe", "changes", "quick")
+	copyFixture(t, filepath.Join("..", "..", "testdata", "artifacts", "quick"), dir)
+	service := Service{Dir: root}
+	if _, err := service.CreateChange("quick", artifacts.Quick); err != nil {
+		t.Fatal(err)
+	}
+	taskPath := filepath.Join(dir, "tasks", "T1.md")
+	data, err := os.ReadFile(taskPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(taskPath, []byte(strings.Replace(string(data), "role: none", "role: laravel-implementer", 1)), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	check, err := service.Check("quick")
+	if err != nil || check.Valid || len(check.Issues) == 0 || check.Issues[len(check.Issues)-1].Code != "invalid_role" {
+		t.Fatalf("Check() = %#v, %v", check, err)
+	}
+}
+
 func copyFixture(t *testing.T, source, target string) {
 	t.Helper()
 	if err := filepath.WalkDir(source, func(path string, entry os.DirEntry, err error) error {
@@ -104,6 +126,18 @@ func copyFixture(t *testing.T, source, target string) {
 		}
 		return os.WriteFile(out, data, 0o600)
 	}); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func writeBackendRole(t *testing.T, root string) {
+	t.Helper()
+	dir := filepath.Join(root, ".pathframe", "roles")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	role := "schema: pathframe.role/v1\nid: backend-engineer\nmission: Implement backend work.\nreads: []\noptional_reads: []\nallowed_actions: [\"edit\",\"test\"]\nreturns: [\"summary\",\"changed_files\",\"verification\",\"discoveries\",\"questions\"]\n"
+	if err := os.WriteFile(filepath.Join(dir, "backend-engineer.yaml"), []byte(role), 0o600); err != nil {
 		t.Fatal(err)
 	}
 }

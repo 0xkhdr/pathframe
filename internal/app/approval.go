@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/0xkhdr/pathframe/internal/artifacts"
+	pfcontext "github.com/0xkhdr/pathframe/internal/context"
 	"github.com/0xkhdr/pathframe/internal/store"
 	"github.com/0xkhdr/pathframe/internal/workflow"
 )
@@ -29,6 +30,25 @@ func (s Service) Check(change string) (artifacts.CheckResult, error) {
 		return artifacts.CheckResult{}, err
 	}
 	plan, issues := artifacts.Validate(dir)
+	for _, task := range plan.Tasks {
+		if task.ExecutionPolicy == "brain" && task.Role != "none" {
+			issues = append(issues, artifacts.Issue{Path: task.Path, Code: "invalid_role", Message: "brain task requires role none"})
+		}
+		if task.ExecutionPolicy == "delegated" {
+			if task.Role == "" || task.Role == "none" {
+				issues = append(issues, artifacts.Issue{Path: task.Path, Code: "invalid_role", Message: "delegated task requires a declared role"})
+				continue
+			}
+			role, roleErr := pfcontext.LoadRole(filepath.Join(root, ".pathframe", "roles", task.Role+".yaml"))
+			if roleErr != nil || role.ID != task.Role {
+				message := "role id does not match task role"
+				if roleErr != nil {
+					message = roleErr.Error()
+				}
+				issues = append(issues, artifacts.Issue{Path: task.Path, Code: "unknown_role", Message: message})
+			}
+		}
+	}
 	replay, replayErr := store.ReplayAndRepair(dir)
 	if replayErr != nil {
 		return artifacts.CheckResult{}, replayErr
@@ -73,7 +93,7 @@ func (s Service) Approve(change string) (artifacts.ApprovalResult, error) {
 		if err := store.Append(filepath.Join(dir, "history.jsonl"), event); err != nil {
 			return artifacts.ApprovalResult{}, err
 		}
-		replay, err = store.ReplayAndRepair(dir)
+		replay, err = store.RefreshProjection(dir)
 		if err != nil {
 			return artifacts.ApprovalResult{}, err
 		}
@@ -92,7 +112,7 @@ func (s Service) Approve(change string) (artifacts.ApprovalResult, error) {
 	if err := store.Append(filepath.Join(dir, "history.jsonl"), event); err != nil {
 		return artifacts.ApprovalResult{}, err
 	}
-	if _, err := store.ReplayAndRepair(dir); err != nil {
+	if _, err := store.RefreshProjection(dir); err != nil {
 		return artifacts.ApprovalResult{}, err
 	}
 	return artifacts.ApprovalResult{Schema: artifacts.ApprovalSchema, Change: check.Change, Mode: check.Mode, Identity: check.Identity, Approved: event.Timestamp, Phase: string(workflow.PhaseReady)}, nil

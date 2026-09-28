@@ -38,6 +38,10 @@ func TestCodexPlanningJourney(t *testing.T) {
 	if approved["approval"] == nil {
 		t.Fatalf("approval = %v", approved)
 	}
+	doctor := callTool(t, ctx, session, "pathframe_doctor", map[string]any{"change": "demo"})
+	if doctor["healthy"] != true {
+		t.Fatalf("MCP doctor = %v", doctor)
+	}
 	if err := session.Close(); err != nil {
 		t.Fatal(err)
 	}

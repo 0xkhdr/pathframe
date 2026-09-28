@@ -19,6 +19,16 @@ func TestQuickStandardHighRiskApprovalJourney(t *testing.T) {
 			source := filepath.Join(repository, "testdata", "artifacts", mode)
 			target := filepath.Join(root, ".pathframe", "changes", "demo")
 			copyAuthored(t, source, target)
+			if mode != "quick" {
+				roleDir := filepath.Join(root, ".pathframe", "roles")
+				if err := os.MkdirAll(roleDir, 0o755); err != nil {
+					t.Fatal(err)
+				}
+				role := "schema: pathframe.role/v1\nid: backend-engineer\nmission: Implement bounded work.\nreads: []\noptional_reads: []\nallowed_actions: [\"edit\",\"test\"]\nreturns: [\"summary\",\"changed_files\",\"verification\",\"discoveries\",\"questions\"]\n"
+				if err := os.WriteFile(filepath.Join(roleDir, "backend-engineer.yaml"), []byte(role), 0o600); err != nil {
+					t.Fatal(err)
+				}
+			}
 			if got := run(t, binary, root, "check", "--change", "demo", "--json"); !strings.Contains(got, `"valid": true`) {
 				t.Fatalf("check = %s", got)
 			}

@@ -193,6 +193,7 @@ Use only the typed MCP tools from the `+"`pathframe`"+` server. Never construct 
 7. Use `+"`pathframe_get_next`"+` to resume. For a ready delegated task, call `+"`pathframe_prepare_delegation`"+` with `+"`host: claude-code`"+`. Only after preflight succeeds and returns a lease, launch one native subagent using the packet and Pinky rules. Submit its exact structured result with `+"`pathframe_submit_result`"+`.
 8. After a completed submission, call `+"`pathframe_run_verification`"+` with a project-relative workdir and positive timeout. Pinky's verification report is supplemental. Brain then calls `+"`pathframe_accept_task`"+` with its semantic reason, or `+"`pathframe_request_changes`"+` with corrective reason. Scope violations require an explicit keep, revert, or replan decision.
 9. Before Brain edits, call `+"`pathframe_check_brain_edit`"+` and obey it. Delegation failure never authorizes Brain fallback. Write scope is advisory unless the packet says `+"`host_enforced`"+`.
+10. Call `+"`pathframe_doctor`"+` for typed diagnosis and listed safe repairs. Use `+"`pathframe_recover`"+` for pause, resume, replan, or cancel.
 
 Pathframe never launches the host worker itself. Pinky may implement only the leased task and may only submit a result. Pinky cannot verify for Pathframe, approve itself, or alter plan state. Do not invent parallel, expanded Doctor, or compatibility operations.
 `) + "\n"

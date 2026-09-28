@@ -144,7 +144,7 @@ func (s Service) appendDelegationTransition(changeDir string, action workflow.Ac
 	if err := store.Append(filepath.Join(changeDir, "history.jsonl"), event); err != nil {
 		return err
 	}
-	_, err = store.ReplayAndRepair(changeDir)
+	_, err = store.RefreshProjection(changeDir)
 	return err
 }
 

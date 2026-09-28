@@ -122,8 +122,12 @@ func generated(root, executable string, sessionOrientation bool) (map[string]str
   "pathframe_get_next",
   "pathframe_prepare_delegation",
   "pathframe_submit_result",
+  "pathframe_run_verification",
+  "pathframe_accept_task",
+  "pathframe_request_changes",
   "pathframe_release_delegation",
   "pathframe_check_brain_edit",
+  "pathframe_doctor",
   "pathframe_recover",
 ]`
 	config := "# " + generatedMarker + "\n[mcp_servers.pathframe]\ncommand = " + q(executable) + "\nargs = [\"mcp\"]\ncwd = " + q(root) + "\nenabled_tools = " + tools + "\n"
@@ -193,6 +197,7 @@ Use only the typed `+"`pathframe_*`"+` MCP tools. Never construct Pathframe CLI 
 7. Call `+"`pathframe_get_next`"+` to resume or identify the next legal action. For a ready delegated task, call `+"`pathframe_prepare_delegation`"+` with `+"`host: codex`"+`. Only after its preflight succeeds and returns a lease, launch one native subagent using the packet and Pinky rules. Submit its exact structured result with `+"`pathframe_submit_result`"+`.
 8. After a completed submission, call `+"`pathframe_run_verification`"+` with a project-relative workdir and positive timeout. Treat Pinky's verification report as supplemental. Brain then calls `+"`pathframe_accept_task`"+` with its semantic reason, or `+"`pathframe_request_changes`"+` with corrective reason. Scope violations require an explicit keep, revert, or replan decision.
 9. Before Brain edits, call `+"`pathframe_check_brain_edit`"+` and obey it. Delegation failure never authorizes Brain fallback. Treat write scope as advisory unless the packet says `+"`host_enforced`"+`.
+10. Call `+"`pathframe_doctor`"+` for typed diagnosis and listed safe repairs. Use `+"`pathframe_recover`"+` for pause, resume, replan, or cancel.
 
 Pathframe never launches the host worker itself. Pinky may implement only the leased task and may only submit a result. Pinky cannot verify for Pathframe, approve itself, or alter plan state. Do not invent parallel, expanded Doctor, or compatibility operations.
 `) + "\n"

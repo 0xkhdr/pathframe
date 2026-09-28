@@ -58,6 +58,14 @@ func WriteProjection(path string, projection Projection) error {
 }
 
 func ReplayAndRepair(changeDir string) (Replay, error) {
+	return replayAndRepair(changeDir, true)
+}
+
+func RefreshProjection(changeDir string) (Replay, error) {
+	return replayAndRepair(changeDir, false)
+}
+
+func replayAndRepair(changeDir string, diagnoseMismatch bool) (Replay, error) {
 	journalPath := filepath.Join(changeDir, "history.jsonl")
 	replay, err := ReadJournal(journalPath)
 	if err != nil {
@@ -73,7 +81,7 @@ func ReplayAndRepair(changeDir string) (Replay, error) {
 	want := Projection{Schema: workflow.Schema, Events: replay.Events, State: replay.State}
 	got, loadErr := LoadProjection(filepath.Join(changeDir, "state.json"))
 	if loadErr != nil || got != want {
-		if (loadErr != nil && !errors.Is(loadErr, os.ErrNotExist)) || (loadErr == nil && got != want) {
+		if diagnoseMismatch && ((loadErr != nil && !errors.Is(loadErr, os.ErrNotExist)) || (loadErr == nil && got != want)) {
 			replay.Diagnostics = append(replay.Diagnostics, workflow.ReasonCorruptProjection)
 		}
 		if err := WriteProjection(filepath.Join(changeDir, "state.json"), want); err != nil {

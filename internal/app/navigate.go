@@ -49,7 +49,7 @@ func (s Service) Transition(change string, action workflow.Action) (workflow.Res
 	if err := store.Append(filepath.Join(dir, "history.jsonl"), event); err != nil {
 		return workflow.Result{}, err
 	}
-	replayed, err = store.ReplayAndRepair(dir)
+	replayed, err = store.RefreshProjection(dir)
 	if err != nil {
 		return workflow.Result{}, err
 	}

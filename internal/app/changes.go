@@ -99,7 +99,7 @@ func (s Service) CreateChange(change string, mode artifacts.Mode) (artifacts.Che
 			return artifacts.CheckResult{}, err
 		}
 	}
-	if _, err := store.ReplayAndRepair(dir); err != nil {
+	if _, err := store.RefreshProjection(dir); err != nil {
 		return artifacts.CheckResult{}, err
 	}
 	return s.Check(change)
