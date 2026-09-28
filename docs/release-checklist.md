@@ -26,7 +26,7 @@ Stable release requires an explicit human go decision.
 4. Confirm every supported-platform claim has a native build, install, and journey result. Keep cross-build-only systems as portability targets.
 5. Review [security](security-model.md) and [compatibility and limitations](compatibility-and-limitations.md); accept or resolve every open finding.
 6. Verify Codex and Claude Code generated integration manifests and Doctor checks against the release binary.
-7. Produce the Linux amd64 archive and SHA-256 checksum from a clean checkout. Rebuild once and compare checksums before publication.
+7. Produce `pathframe_linux_amd64.tar.gz` containing the executable and `pathframe_linux_amd64.tar.gz.sha256` from a clean checkout. Rebuild once and compare checksums before publication.
 8. Tag only after the human go decision. Preserve prior artifacts so update rollback remains possible.
 
 If any required evidence fails, fix it and repeat the checklist or reduce the corresponding support claim. Do not publish a stable release from a cross-build result alone.

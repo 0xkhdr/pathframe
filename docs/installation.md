@@ -2,7 +2,29 @@
 
 Purpose: build, install, update, and uninstall the supported Pathframe binary.
 
-Pathframe 1.x supports Linux amd64. Build a versioned binary with Go 1.26, then install it atomically:
+Pathframe 1.x supports Linux amd64. Install or update the latest release:
+
+```sh
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xkhdr/pathframe/main/scripts/install.sh | sh
+```
+
+This installs to `$HOME/.local/bin/pathframe`; ensure that directory is on `PATH`. To install a specific release:
+
+```sh
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xkhdr/pathframe/main/scripts/install.sh | PATHFRAME_VERSION=v1.0.0 sh
+```
+
+The installer downloads the release archive and its SHA-256 checksum over HTTPS, verifies it, and atomically replaces only the executable. An error or interruption before replacement leaves the prior binary installed. It never reads or changes `.pathframe/` project data or host configuration.
+
+Uninstall only the binary:
+
+```sh
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xkhdr/pathframe/main/scripts/install.sh | sh -s -- uninstall
+```
+
+You can inspect the script before running it instead of piping it directly to `sh`.
+
+To build and install from a checkout instead:
 
 ```sh
 go build -trimpath -ldflags "-X github.com/0xkhdr/pathframe/internal/app.Version=v1.0.0" -o pathframe ./cmd/pathframe
@@ -10,12 +32,4 @@ go build -trimpath -ldflags "-X github.com/0xkhdr/pathframe/internal/app.Version
 pathframe --version
 ```
 
-Update by passing a newly built, executable binary to the same command. The installer stages the complete binary beside the destination and performs one atomic rename, so an error or interruption before that boundary leaves the prior binary installed. It never reads or changes `.pathframe/` project data or host configuration.
-
-Uninstall only the binary:
-
-```sh
-./scripts/install.sh uninstall "$HOME/.local/bin/pathframe"
-```
-
-The default destination is `/usr/local/bin/pathframe`. The script refuses symlink destinations. Back up project data separately; uninstall does not delete it.
+Set `PATHFRAME_INSTALL_DIR=/usr/local/bin` for a system-wide install; elevated privileges may be required. The script refuses symlink destinations. Back up project data separately; uninstall does not delete it.

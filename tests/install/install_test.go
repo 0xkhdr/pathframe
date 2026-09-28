@@ -36,6 +36,56 @@ func TestInstallCleanMachineJourney(t *testing.T) {
 	}
 }
 
+func TestDownloadInstallVerifiesRelease(t *testing.T) {
+	if runtime.GOOS != "linux" || runtime.GOARCH != "amd64" {
+		t.Skip("the initial supported platform is Linux amd64")
+	}
+	repository, _ := filepath.Abs(filepath.Join("..", ".."))
+	dir := t.TempDir()
+	release := filepath.Join(dir, "release")
+	if err := os.Mkdir(release, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	executable(t, release, "pathframe", "#!/bin/sh\necho downloaded\n")
+	archive := filepath.Join(release, "pathframe_linux_amd64.tar.gz")
+	command := exec.Command("tar", "-czf", archive, "pathframe")
+	command.Dir = release
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Fatalf("archive: %s: %v", output, err)
+	}
+	sum := exec.Command("sha256sum", "pathframe_linux_amd64.tar.gz")
+	sum.Dir = release
+	checksum, err := sum.Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(archive+".sha256", checksum, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	fakebin := filepath.Join(dir, "fakebin")
+	if err := os.Mkdir(fakebin, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	executable(t, fakebin, "curl", "#!/bin/sh\nwhile [ \"$1\" != -o ]; do shift; done\nout=$2\nshift 2\ncp \"$PATHFRAME_TEST_RELEASE/${1##*/}\" \"$out\"\n")
+	targetDir := filepath.Join(dir, "bin")
+	command = exec.Command(filepath.Join(repository, "scripts", "install.sh"))
+	environment := append(os.Environ(), "PATH="+fakebin+":"+os.Getenv("PATH"), "PATHFRAME_TEST_RELEASE="+release, "PATHFRAME_INSTALL_DIR="+targetDir)
+	command.Env = environment
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Fatalf("download install: %s: %v", output, err)
+	}
+	assertOutput(t, filepath.Join(targetDir, "pathframe"), "downloaded\n")
+	if err := os.WriteFile(archive+".sha256", []byte(strings.Repeat("0", 64)+"  pathframe_linux_amd64.tar.gz\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	command = exec.Command(filepath.Join(repository, "scripts", "install.sh"))
+	command.Env = environment
+	if err := command.Run(); err == nil {
+		t.Fatal("installer accepted a release with a mismatched checksum")
+	}
+	assertOutput(t, filepath.Join(targetDir, "pathframe"), "downloaded\n")
+}
+
 func TestInstallUpdateFailureAndUninstall(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("the initial installer supports the claimed Linux platform")
