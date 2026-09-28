@@ -1,5 +1,7 @@
 # Install and update
 
+Purpose: build, install, update, and uninstall the supported Pathframe binary.
+
 Pathframe 1.x supports Linux amd64. Build a versioned binary with Go 1.26, then install it atomically:
 
 ```sh

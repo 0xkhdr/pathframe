@@ -1,5 +1,7 @@
 # Security model
 
+Purpose: define trust boundaries, enforced controls, and protections Pathframe does not provide.
+
 Pathframe treats project paths, authored artifacts, worker results, host manifests, journal records, and verification arguments as untrusted input.
 
 Controls in the initial release:

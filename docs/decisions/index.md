@@ -1,5 +1,7 @@
 # Pathframe Decision Records
 
+Purpose: define when architecture decisions need records and how humans approve them.
+
 This directory records intentional deviations from the accepted Pathframe plan and genuinely new architecture or scope decisions. It is not a backlog and must not reopen settled choices without direct repository evidence.
 
 ## Accepted baseline

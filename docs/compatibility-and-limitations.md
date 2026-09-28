@@ -1,5 +1,7 @@
 # Compatibility and limitations
 
+Purpose: state supported platforms, integration contracts, portability evidence, and known limits.
+
 “Supported” means native build, clean installation, full sequential journey, and the Stage 9 verification suite pass. A cross-build alone establishes only a portability target.
 
 Evidence for the initial release:

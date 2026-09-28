@@ -1,5 +1,7 @@
 # 0001: Do not build a Specd importer
 
+Purpose: record the accepted decision to omit Specd compatibility from the initial release.
+
 Status: accepted
 Date: 2026-09-28
 Stage: 9

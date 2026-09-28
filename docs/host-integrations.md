@@ -1,5 +1,7 @@
 # Codex and Claude Code integrations
 
+Purpose: install, validate, and operate Pathframe through supported coding-agent hosts.
+
 Build or install `pathframe`, then install the integration from the project root:
 
 | Host | Install | Check |

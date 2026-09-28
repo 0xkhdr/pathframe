@@ -18,11 +18,12 @@ Running `pathframe` without arguments provides project and active-change orienta
 
 | Need | Read |
 | --- | --- |
-| Install and try Pathframe | [Install](docs/install.md), then [Getting started](docs/getting-started.md) |
-| Use the product | [CLI reference](docs/CLI.md), [Planning artifacts](docs/ARTIFACTS.md), [Codex and Claude Code](docs/INTEGRATIONS.md) |
-| Recover interrupted work | [Doctor and recovery](docs/DOCTOR.md) |
-| Evaluate production use | [Compatibility and limitations](docs/compatibility.md), [Security](docs/security.md) |
-| Contribute or release | [Contributing](CONTRIBUTING.md), [Release checklist](docs/release.md), [Decision records](docs/decisions/README.md) |
+| Understand Pathframe | [Documentation guide](docs/index.md), then [Core concepts](docs/concepts.md) |
+| Install and try Pathframe | [Installation](docs/installation.md), then [Getting started](docs/getting-started.md) |
+| Use the product | [CLI reference](docs/cli-reference.md), [Planning artifacts](docs/planning-artifacts.md), [Host integrations](docs/host-integrations.md) |
+| Recover interrupted work | [Recovery](docs/recovery.md) |
+| Evaluate production use | [Compatibility and limitations](docs/compatibility-and-limitations.md), [Security model](docs/security-model.md) |
+| Contribute or release | [Contributing](CONTRIBUTING.md), [Release checklist](docs/release-checklist.md), [Decision records](docs/decisions/index.md) |
 
 ## Boundaries
 

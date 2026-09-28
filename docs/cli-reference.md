@@ -1,5 +1,7 @@
 # Command-line reference
 
+Purpose: list every CLI operation, its contract, and its recovery behavior.
+
 Running `pathframe` with no arguments is equivalent to `pathframe status`. Both answer whether the project is configured, which change and phase are active, task progress, blockers, the recommended next action, legal alternatives, and whether a human is required.
 
 ```text
@@ -10,7 +12,7 @@ pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|
 - `pause`, `resume`, `replan`, and `cancel` append a human transition to the selected change journal and rebuild `state.json`.
 - `--json` renders the canonical object; text is a projection of the same object.
 - `--change ID` is required when more than one change exists.
-- `doctor --change ID [--repair]` previews typed recovery diagnoses and optionally applies only safe machine-state repairs. See [Doctor and recovery](DOCTOR.md).
+- `doctor --change ID [--repair]` previews typed recovery diagnoses and optionally applies only safe machine-state repairs. See [Recovery](recovery.md).
 - `new --change ID --mode quick|standard|high-risk` creates a planning change and only its required missing artifacts.
 - `template --mode MODE --artifact KIND` prints the owned Markdown template; `--json` returns its typed filling instructions.
 - `check --change ID` validates artifacts, tasks, references, questions, acceptance, and structured verification.
@@ -29,4 +31,4 @@ pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|
 
 Flags may follow the command. Illegal transitions exit nonzero after returning current state, a stable reason code, and executable recovery actions. An incomplete final journal record is diagnosed and safely discarded without inventing state; a missing, corrupt, or divergent projection is rebuilt from complete journal records.
 
-See [Planning artifacts](ARTIFACTS.md) and [Host integrations](INTEGRATIONS.md). `pathframe mcp` is the generated local stdio entry point, not a generic command executor. Worker-reported checks remain supplemental; task completion requires both Pathframe verification and Brain semantic acceptance.
+See [Planning artifacts](planning-artifacts.md) and [Host integrations](host-integrations.md). `pathframe mcp` is the generated local stdio entry point, not a generic command executor. Worker-reported checks remain supplemental; task completion requires both Pathframe verification and Brain semantic acceptance.

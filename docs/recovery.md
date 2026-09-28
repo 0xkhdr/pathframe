@@ -1,5 +1,7 @@
 # Doctor and recovery
 
+Purpose: diagnose damaged or interrupted workflows and describe safe recovery paths.
+
 `pathframe doctor --change ID` returns `pathframe.diagnosis/v1` without changing files. `--repair` applies only the repair named by a diagnosis: rebuilding replaceable `state.json`, discarding an incomplete trailing journal fragment, or releasing an abandoned lease through recorded events.
 
 Doctor never edits authored Markdown or `change.yaml`, deletes `.pathframe/`, rewrites Git history, or repairs malformed complete journal/run records. Those diagnoses require a human to repair the named source and rerun Doctor.

@@ -1,5 +1,7 @@
 # Planning artifacts
 
+Purpose: define Pathframe's authored planning files, validation rules, roles, and context packets.
+
 Pathframe owns the human-readable `okf-markdown/v1` profile. Each Markdown file starts with flat `key: value` front matter and uses the exact `##` sections returned by `pathframe template`. Unknown prose is allowed inside sections; missing sections, placeholders, unresolved questions, broken references, and shell-string verification are rejected.
 
 Modes require:

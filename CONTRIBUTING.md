@@ -33,7 +33,7 @@ go test ./...
 GOOS=linux GOARCH=amd64 go build ./cmd/pathframe
 ```
 
-Run the relevant test in `tests/journey` when behavior crosses an adapter, persistence, delegation, verification, or recovery boundary. Use `go test -race ./...` for changes to process execution or shared state. The complete release matrix lives in [docs/release.md](docs/release.md).
+Run the relevant test in `tests/journey` when behavior crosses an adapter, persistence, delegation, verification, or recovery boundary. Use `go test -race ./...` for changes to process execution or shared state. The complete release matrix lives in [docs/release-checklist.md](docs/release-checklist.md).
 
 ## Engineering rules
 
@@ -48,7 +48,7 @@ Run the relevant test in `tests/journey` when behavior crosses an adapter, persi
 
 ## Documentation and decisions
 
-Update the smallest owning page when a public contract or supported behavior changes: `README.md` for orientation, `docs/CLI.md` for commands, `docs/ARTIFACTS.md` for authored formats, and `docs/INTEGRATIONS.md` for host setup. Accepted implementation decisions are fixed constraints, not recurring questions. Follow [the decision process](docs/decisions/README.md) only when new repository evidence forces a deviation or a new architecture/scope decision blocks work.
+Files under `docs/` use lowercase kebab-case names. Each page starts with one purpose sentence. Update the smallest owning page when a public contract changes: `README.md` for orientation, `docs/cli-reference.md` for commands, `docs/planning-artifacts.md` for authored formats, and `docs/host-integrations.md` for host setup. Add or rename pages in [docs/index.md](docs/index.md). Accepted implementation decisions are fixed constraints, not recurring questions. Follow [the decision process](docs/decisions/index.md) only when new repository evidence forces a deviation or a new architecture or scope decision blocks work.
 
 ## Completion gate
 
