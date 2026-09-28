@@ -29,4 +29,4 @@ pathframe [--json] [--change ID] [status|next|new|template|check|approve|packet|
 
 Flags may follow the command. Illegal transitions exit nonzero after returning current state, a stable reason code, and executable recovery actions. An incomplete final journal record is diagnosed and safely discarded without inventing state; a missing, corrupt, or divergent projection is rebuilt from complete journal records.
 
-See [Planning artifacts](ARTIFACTS.md), [Codex integration](CODEX.md), and [Claude Code integration](CLAUDE-CODE.md). `pathframe mcp` is the generated local stdio entry point, not a generic command executor. Worker-reported checks remain supplemental; task completion requires both Pathframe verification and Brain semantic acceptance.
+See [Planning artifacts](ARTIFACTS.md) and [Host integrations](INTEGRATIONS.md). `pathframe mcp` is the generated local stdio entry point, not a generic command executor. Worker-reported checks remain supplemental; task completion requires both Pathframe verification and Brain semantic acceptance.

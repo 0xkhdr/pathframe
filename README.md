@@ -12,9 +12,17 @@ Pathframe Stages 0 through 9 are implemented and approved. The sequential produc
 
 The supported production platform is Linux amd64 with Go 1.26. Linux arm64, macOS amd64/arm64, and Windows amd64 remain portability targets with cross-build evidence only.
 
-## Intended first use
+## Documentation
 
-Running `pathframe` without arguments provides project and active-change orientation instead of bare usage. Start with [installation](docs/install.md) and [getting started](docs/getting-started.md), then see the [CLI reference](docs/CLI.md), [Codex integration](docs/CODEX.md), and [Claude Code integration](docs/CLAUDE-CODE.md). Review [compatibility](docs/compatibility.md), [security](docs/security.md), and [known limitations](docs/limitations.md) before production use.
+Running `pathframe` without arguments provides project and active-change orientation instead of bare usage.
+
+| Need | Read |
+| --- | --- |
+| Install and try Pathframe | [Install](docs/install.md), then [Getting started](docs/getting-started.md) |
+| Use the product | [CLI reference](docs/CLI.md), [Planning artifacts](docs/ARTIFACTS.md), [Codex and Claude Code](docs/INTEGRATIONS.md) |
+| Recover interrupted work | [Doctor and recovery](docs/DOCTOR.md) |
+| Evaluate production use | [Compatibility and limitations](docs/compatibility.md), [Security](docs/security.md) |
+| Contribute or release | [Contributing](CONTRIBUTING.md), [Release checklist](docs/release.md), [Decision records](docs/decisions/README.md) |
 
 ## Boundaries
 
@@ -32,4 +40,4 @@ Pathframe will not initially provide a proprietary LLM runtime, universal agent 
 
 ## Contributing
 
-Architecture and product constraints are documented in [ARCHITECTURE.md](ARCHITECTURE.md) and [PHILOSOPHY.md](PHILOSOPHY.md). See [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before changing the repository. Record intentional deviations from accepted decisions using [the decision process](docs/decisions/README.md).
+Start with [CONTRIBUTING.md](CONTRIBUTING.md). Architecture and product constraints are fixed in [ARCHITECTURE.md](ARCHITECTURE.md) and [PHILOSOPHY.md](PHILOSOPHY.md); coding agents must also follow [AGENTS.md](AGENTS.md).

@@ -13,6 +13,6 @@ pathframe approve --change demo
 pathframe next --change demo
 ```
 
-Fill the generated Markdown before `check`. `approve` represents explicit human approval; never call it merely because validation passed. For Codex or Claude Code, follow [Codex](CODEX.md) or [Claude Code](CLAUDE-CODE.md) and use the typed MCP operations instead of constructing CLI commands.
+Fill the generated Markdown before `check`. `approve` represents explicit human approval; never call it merely because validation passed. For Codex or Claude Code, follow [Host integrations](INTEGRATIONS.md) and use the typed MCP operations instead of constructing CLI commands.
 
 During execution, `pathframe doctor --change demo` diagnoses recovery. Use the reported pause, release/retry, replan, repair, or cancel operation. Do not delete `.pathframe/` or rewrite Git history.
